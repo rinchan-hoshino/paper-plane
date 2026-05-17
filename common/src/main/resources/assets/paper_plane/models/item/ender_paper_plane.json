@@ -1,0 +1,6 @@
+{
+  "parent": "paper_plane:item/paper_plane",
+  "textures": {
+    "paper": "paper_plane:item/ender_paper_plane"
+  }
+}
