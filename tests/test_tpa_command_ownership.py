@@ -1,30 +1,68 @@
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+COMMON = ROOT / "common/src/main"
 
 
 class TpaCommandOwnershipTest(unittest.TestCase):
-    def test_paper_plane_owns_accept_and_deny_entrypoints(self) -> None:
-        commands_path = ROOT / "common/src/main/java/dev/rinchan/paperplane/PaperPlaneCommands.java"
-        self.assertTrue(commands_path.is_file())
-        source = commands_path.read_text(encoding="utf-8")
-        self.assertIn('Commands.literal("tpaccept")', source)
-        self.assertIn('Commands.literal("tpdeny")', source)
-        self.assertIn("PaperPlane.acceptTeleportRequest", source)
-        self.assertIn("PaperPlane.denyTeleportRequest", source)
-        self.assertNotIn("FTBEConfig", source)
-
-    def test_command_registration_is_unconditional(self) -> None:
+    def test_server_registers_no_tpa_commands(self) -> None:
+        self.assertFalse(
+            (COMMON / "java/dev/rinchan/paperplane/PaperPlaneCommands.java").exists()
+        )
         entrypoint = (
-            ROOT / "common/src/main/java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
+            COMMON / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
         ).read_text(encoding="utf-8")
-        self.assertIn("RegisterCommandsEvent", entrypoint)
-        self.assertIn("PaperPlaneCommands.register(event.getDispatcher())", entrypoint)
-        self.assertNotIn("FTBEConfig", entrypoint)
+        self.assertNotIn("RegisterCommandsEvent", entrypoint)
+        self.assertNotIn("Commands.literal", entrypoint)
+        self.assertNotIn("PaperPlaneCommands", entrypoint)
+
+    def test_ftb_chat_buttons_are_routed_through_a_payload(self) -> None:
+        packet = (
+            COMMON / "java/dev/rinchan/paperplane/RespondTeleportPacket.java"
+        ).read_text(encoding="utf-8")
+        self.assertIn("UUID requestId", packet)
+        self.assertIn("boolean accept", packet)
+        self.assertIn('"respond_teleport"', packet)
+
+        client = (
+            COMMON / "java/dev/rinchan/paperplane/client/PaperPlaneClient.java"
+        ).read_text(encoding="utf-8")
+        self.assertIn('"tpaccept "', client)
+        self.assertIn('"tpdeny "', client)
+        self.assertIn("PacketDistributor.sendToServer", client)
+        self.assertIn("new RespondTeleportPacket", client)
+
+        mixin = (
+            COMMON / "java/dev/rinchan/paperplane/mixin/ClientPacketListenerMixin.java"
+        ).read_text(encoding="utf-8")
+        self.assertIn('method = "sendUnsignedCommand"', mixin)
+        self.assertIn("PaperPlaneClient.handleTeleportResponseCommand", mixin)
+        self.assertIn("cancellable = true", mixin)
+
+        mixin_config = json.loads(
+            (COMMON / "resources/paper_plane.mixins.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("ClientPacketListenerMixin", mixin_config["client"])
+
+    def test_server_payload_calls_ftb_backend_directly(self) -> None:
+        entrypoint = (
+            COMMON / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
+        ).read_text(encoding="utf-8")
+        self.assertIn("RespondTeleportPacket.TYPE", entrypoint)
+        self.assertIn("PaperPlane.respondToTeleportRequest", entrypoint)
+
+        source = (COMMON / "java/dev/rinchan/paperplane/PaperPlane.java").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("FTB_TPA.tpa(requester, target, false)", source)
+        self.assertIn("FTB_TPA.tpaccept(target, requestId.toString())", source)
+        self.assertIn("FTB_TPA.tpdeny(target, requestId.toString())", source)
+        self.assertNotIn("FTBEConfig", source)
 
     def test_release_metadata_matches_current_source_license(self) -> None:
         properties = {}
@@ -32,16 +70,9 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 properties[key] = value
-        self.assertEqual("0.1.6", properties["mod_version"])
+        self.assertEqual("0.1.7", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
         self.assertEqual("8442866", properties["ftb_essentials_file_id"])
-
-    def test_request_backend_is_called_directly(self) -> None:
-        source = (ROOT / "common/src/main/java/dev/rinchan/paperplane/PaperPlane.java").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("FTB_TPA.tpa(requester, target, false)", source)
-        self.assertNotIn("FTBEConfig", source)
 
 
 if __name__ == "__main__":

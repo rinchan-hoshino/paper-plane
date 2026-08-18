@@ -51,12 +51,10 @@ public final class PaperPlane {
         }
     }
 
-    public static int acceptTeleportRequest(ServerPlayer target, String requestId) {
-        return FTB_TPA.tpaccept(target, requestId);
-    }
-
-    public static int denyTeleportRequest(ServerPlayer target, String requestId) {
-        return FTB_TPA.tpdeny(target, requestId);
+    public static int respondToTeleportRequest(ServerPlayer target, UUID requestId, boolean accept) {
+        return accept
+            ? FTB_TPA.tpaccept(target, requestId.toString())
+            : FTB_TPA.tpdeny(target, requestId.toString());
     }
 
     public static void finishAcceptedRequest(ServerPlayer target, UUID requestId) {
