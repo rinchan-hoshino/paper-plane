@@ -21,21 +21,19 @@ final class PaperPlaneTextureRepairContractTest {
     }
 
     @Test
-    void modelUsesAPixelSilhouetteAndSteppedTKeelWithoutObjFallbacks() throws Exception {
+    void modelUsesMinecraftScaleUnitVoxelsForTheWingAndTKeel() throws Exception {
         Path modelPath = resources().resolve("assets/paper_plane/models/item/paper_plane.json");
         String model = Files.readString(modelPath);
-        assertEquals(6, occurrences(model, "\"name\":"));
-        assertTrue(model.contains("\"name\": \"pixel_silhouette\""));
-        assertTrue(model.contains("\"name\": \"front_t_bar\""));
-        assertTrue(model.contains("\"transparent\": \"paper_plane:item/transparent\""));
-        assertTrue(model.contains("\"gui\": {\"rotation\": [-90, 0, 0]"));
-
-        for (String fragment : new String[] {
-                "\"from\": [8, 4, 1],\n      \"to\": [9, 8, 4]",
-                "\"from\": [8, 5, 4],\n      \"to\": [9, 8, 7]",
-                "\"from\": [8, 6, 7],\n      \"to\": [9, 8, 10]",
-                "\"from\": [8, 7, 10],\n      \"to\": [9, 8, 13]"
-        }) assertTrue(model.contains(fragment));
+        assertEquals(121, occurrences(model, "\"name\":"));
+        assertEquals(92, occurrences(model, "\"name\": \"wing_"));
+        assertEquals(29, occurrences(model, "\"name\": \"keel_"));
+        assertFalse(model.contains("transparent"));
+        assertTrue(model.contains("\"name\": \"wing_8_0\""));
+        assertTrue(model.contains("\"name\": \"keel_4_4\""));
+        assertFalse(model.contains("\"name\": \"keel_1_"));
+        assertFalse(model.contains("\"name\": \"keel_2_"));
+        assertFalse(model.contains("\"name\": \"keel_3_"));
+        assertTrue(model.contains("\"translation\": [\n        -0.5,\n        0,\n        0\n      ]"));
         assertFalse(Files.exists(modelPath.resolveSibling("paper_plane.obj")));
         assertFalse(Files.exists(modelPath.resolveSibling("paper_plane.mtl")));
 
@@ -66,7 +64,7 @@ final class PaperPlaneTextureRepairContractTest {
     }
 
     @Test
-    void edgeTexturesAreOpaqueSingleColourPixelsAndSpacerIsTransparent() throws Exception {
+    void edgeTexturesAreOpaqueSingleColourPixelsWithoutSpacerFallback() throws Exception {
         for (String name : new String[] {"paper_plane_edge", "soggy_paper_plane_edge", "ender_paper_plane_edge"}) {
             BufferedImage image = image(name + ".png");
             assertEquals(16, image.getWidth());
@@ -75,10 +73,7 @@ final class PaperPlaneTextureRepairContractTest {
             assertNotEquals(0, expected >>> 24);
             for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) assertEquals(expected, image.getRGB(x, y));
         }
-        BufferedImage transparent = image("transparent.png");
-        assertEquals(1, transparent.getWidth());
-        assertEquals(1, transparent.getHeight());
-        assertEquals(0, transparent.getRGB(0, 0) >>> 24);
+        assertFalse(Files.exists(resources().resolve("assets/paper_plane/textures/item/transparent.png")));
     }
 
     private static BufferedImage image(String name) throws Exception {
