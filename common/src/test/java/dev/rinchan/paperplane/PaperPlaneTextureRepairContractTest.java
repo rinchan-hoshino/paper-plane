@@ -27,18 +27,18 @@ final class PaperPlaneTextureRepairContractTest {
     }
 
     @Test
-    void eachVariantHasOneConnectedSilhouetteWithoutChangingItsArea() throws Exception {
+    void eachVariantRemovesOnlyTheDetachedTailPixel() throws Exception {
         Set<Integer> referenceMask = null;
         for (String name : new String[] {"paper_plane", "soggy_paper_plane", "ender_paper_plane"}) {
             BufferedImage image = ImageIO.read(resources().resolve("assets/paper_plane/textures/item/" + name + ".png").toFile());
             assertEquals(16, image.getWidth());
             assertEquals(16, image.getHeight());
             Set<Integer> mask = mask(image);
-            assertEquals(78, mask.size());
+            assertEquals(77, mask.size());
             assertEquals(1, componentCount(mask));
             assertTrue(mask.contains(8));
             assertFalse(mask.contains(7));
-            assertTrue(mask.contains(15 * 16 + 13));
+            assertFalse(mask.contains(15 * 16 + 13));
             assertFalse(mask.contains(15 * 16 + 14));
             if (referenceMask == null) referenceMask = mask;
             else assertEquals(referenceMask, mask);
