@@ -10,7 +10,6 @@ base {
 
 sourceSets.main.java.srcDir rootProject.file('common/src/main/java')
 sourceSets.main.resources.srcDir rootProject.file('common/src/main/resources')
-sourceSets.test.java.srcDir rootProject.file('common/src/test/java')
 sourceSets.main.resources.srcDir tasks.register('generateModMetadata', ProcessResources) {
     def replaceProperties = [
         minecraft_version_range: rootProject.minecraft_version_range,
@@ -57,19 +56,12 @@ neoForge.ideSyncTask tasks.named('generateModMetadata')
 
 dependencies {
     compileOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
-    testImplementation platform('org.junit:junit-bom:5.11.4')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     compileOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
     runtimeOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "maven.modrinth:architectury-api:13.0.8+neoforge"
     runtimeOnly "maven.modrinth:lychee:${rootProject.lychee_version}"
     runtimeOnly "maven.modrinth:kiwi:${rootProject.kiwi_version}"
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
 
 publishing {
