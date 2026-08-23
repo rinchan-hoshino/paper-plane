@@ -1,8 +1,6 @@
 package dev.rinchan.paperplane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
@@ -27,19 +25,17 @@ final class PaperPlaneTextureRepairContractTest {
     }
 
     @Test
-    void eachVariantRemovesOnlyTheDetachedTailPixel() throws Exception {
+    void eachVariantHasAnExactlyMirroredConnectedSilhouette() throws Exception {
         Set<Integer> referenceMask = null;
         for (String name : new String[] {"paper_plane", "soggy_paper_plane", "ender_paper_plane"}) {
             BufferedImage image = ImageIO.read(resources().resolve("assets/paper_plane/textures/item/" + name + ".png").toFile());
             assertEquals(16, image.getWidth());
             assertEquals(16, image.getHeight());
             Set<Integer> mask = mask(image);
-            assertEquals(77, mask.size());
+            assertEquals(84, mask.size());
             assertEquals(1, componentCount(mask));
-            assertTrue(mask.contains(8));
-            assertFalse(mask.contains(7));
-            assertFalse(mask.contains(15 * 16 + 13));
-            assertFalse(mask.contains(15 * 16 + 14));
+            for (int y = 0; y < 16; y++) for (int x = 0; x < 8; x++)
+                assertEquals(image.getRGB(x, y), image.getRGB(15 - x, y));
             if (referenceMask == null) referenceMask = mask;
             else assertEquals(referenceMask, mask);
         }
