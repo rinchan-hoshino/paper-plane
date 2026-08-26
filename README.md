@@ -47,4 +47,4 @@ There is no Paper Plane config file, command, capability, attachment, player Sav
 
 ## Support
 
-Current formal release target: Minecraft 1.21.1 NeoForge.
+Formal 1.0.0 targets: Minecraft 1.21.1 NeoForge and Minecraft 26.1.2 NeoForge. Minecraft 26.2 is excluded because FTB Library and FTB Essentials have no 26.2 release.
