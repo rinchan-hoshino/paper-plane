@@ -3,7 +3,7 @@
 ## 1.0.0
 
 - Promotes the server-authoritative request, atomic payment, two-second charging pose, deterministic glide physics and corrected hand transforms to the stable public contract.
-- Publishes the API-compatible NeoForge anchors supported by the FTB stack.
+- Publishes the Minecraft 1.21.1 NeoForge artifact; later Minecraft generations require a substantive platform port and are not claimed compatible.
 
 ## 0.1.9
 
