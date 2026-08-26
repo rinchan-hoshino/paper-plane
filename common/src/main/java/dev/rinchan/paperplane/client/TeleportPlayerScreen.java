@@ -1,9 +1,9 @@
 package dev.rinchan.paperplane.client;
 
 import dev.ftb.mods.ftblibrary.icon.Icon;
-import dev.ftb.mods.ftblibrary.ui.BaseScreen;
-import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
-import dev.ftb.mods.ftblibrary.ui.Theme;
+import dev.ftb.mods.ftblibrary.client.gui.theme.Theme;
+import dev.ftb.mods.ftblibrary.client.gui.widget.BaseScreen;
+import dev.ftb.mods.ftblibrary.client.gui.widget.SimpleTextButton;
 import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.PlayerEntry;
 import java.util.List;
@@ -46,7 +46,7 @@ public class TeleportPlayerScreen extends BaseScreen {
 
     @Override
     public void alignWidgets() {
-        setPos((getScreen().getGuiScaledWidth() - width) / 2, (getScreen().getGuiScaledHeight() - height) / 2);
+        setPos((getWindow().getGuiScaledWidth() - width) / 2, (getWindow().getGuiScaledHeight() - height) / 2);
     }
 
     @Override

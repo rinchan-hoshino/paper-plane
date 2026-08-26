@@ -2,14 +2,16 @@ package dev.rinchan.paperplane.entity;
 
 import dev.rinchan.paperplane.PaperPlaneFlightModel;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -21,8 +23,8 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
         super(type, level);
     }
 
-    public PaperPlaneEntity(Level level, LivingEntity owner, boolean enderPlane) {
-        super(PaperPlaneRegistries.PAPER_PLANE_ENTITY.get(), owner, level);
+    public PaperPlaneEntity(Level level, LivingEntity owner, ItemStack stack, boolean enderPlane) {
+        super(PaperPlaneRegistries.PAPER_PLANE_ENTITY.get(), owner, level, stack);
         this.enderPlane = enderPlane;
     }
 
@@ -38,16 +40,16 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
         setDeltaMovement(next.x(), next.y(), next.z());
         orientToVelocity();
         super.tick();
-        if (!level().isClientSide() && !resolved && !isRemoved() && isInWater()) {
-            resolveDrop(true);
+        if (level() instanceof ServerLevel serverLevel && !resolved && !isRemoved() && isInWater()) {
+            resolveDrop(serverLevel, true);
         }
     }
 
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide() && !resolved) {
-            resolveDrop(false);
+        if (level() instanceof ServerLevel serverLevel && !resolved) {
+            resolveDrop(serverLevel, false);
         }
     }
 
@@ -62,15 +64,15 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putBoolean("EnderPlane", enderPlane);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("EnderPlane", enderPlane);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        enderPlane = tag.getBoolean("EnderPlane");
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        enderPlane = input.getBooleanOr("EnderPlane", false);
     }
 
     private void orientToVelocity() {
@@ -83,14 +85,14 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
         setXRot((float) (-Mth.atan2(velocity.y, horizontal) * Mth.RAD_TO_DEG));
     }
 
-    private void resolveDrop(boolean wet) {
+    private void resolveDrop(ServerLevel serverLevel, boolean wet) {
         if (resolved) {
             return;
         }
         resolved = true;
         if (!enderPlane) {
             ItemStack result = new ItemStack(wet ? PaperPlaneRegistries.SOGGY_PAPER_PLANE.get() : PaperPlaneRegistries.PAPER_PLANE.get());
-            spawnAtLocation(result);
+            spawnAtLocation(serverLevel, result);
         }
         discard();
     }

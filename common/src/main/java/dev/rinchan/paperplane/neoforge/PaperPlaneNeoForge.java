@@ -27,7 +27,7 @@ public class PaperPlaneNeoForge {
         modBus.addListener(this::registerPayloads);
         modBus.addListener(this::addCreativeTabItems);
         NeoForge.EVENT_BUS.addListener(this::onPlayerLogout);
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
             PaperPlaneClient.register(modBus);
         }
     }

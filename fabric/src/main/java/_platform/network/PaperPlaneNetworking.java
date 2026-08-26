@@ -12,7 +12,7 @@ public final class PaperPlaneNetworking {
     private PaperPlaneNetworking() {}
 
     public static OpenTeleportScreenPacket playerListPacket(MinecraftServer server, UUID requester, UUID sessionId, PlaneKind planeKind) {
-        List<PlayerEntry> players = server.getPlayerList().getPlayers().stream().filter(player -> !player.getUUID().equals(requester)).map(player -> new PlayerEntry(player.getUUID(), player.getGameProfile().getName())).toList();
+        List<PlayerEntry> players = server.getPlayerList().getPlayers().stream().filter(player -> !player.getUUID().equals(requester)).map(player -> new PlayerEntry(player.getUUID(), player.getPlainTextName())).toList();
         return new OpenTeleportScreenPacket(sessionId, players, planeKind == PlaneKind.ENDER);
     }
 

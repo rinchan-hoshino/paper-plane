@@ -21,6 +21,20 @@ final class PaperPlaneTextureRepairContractTest {
     }
 
     @Test
+    void itemDefinitionsResolveEveryRegisteredPlaneModel() throws Exception {
+        Path assets = resources().resolve("assets/paper_plane");
+        for (String item : Set.of("paper_plane", "soggy_paper_plane", "ender_paper_plane")) {
+            Path definition = assets.resolve("items/" + item + ".json");
+            assertTrue(Files.isRegularFile(definition), definition + " must exist for the 1.21.11 item model loader");
+            assertTrue(
+                Files.readString(definition).contains("\"model\": \"paper_plane:item/" + item + "\""),
+                definition + " must resolve its matching model"
+            );
+            assertTrue(Files.isRegularFile(assets.resolve("models/item/" + item + ".json")));
+        }
+    }
+
+    @Test
     void modelUsesMinecraftScaleUnitVoxelsForTheWingAndTKeel() throws Exception {
         Path modelPath = resources().resolve("assets/paper_plane/models/item/paper_plane.json");
         String model = Files.readString(modelPath);

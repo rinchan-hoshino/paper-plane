@@ -6,11 +6,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record RespondTeleportPacket(UUID requestId, boolean accept) implements CustomPacketPayload {
     public static final Type<RespondTeleportPacket> TYPE = new Type<>(
-        ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, "respond_teleport")
+        Identifier.fromNamespaceAndPath(PaperPlane.MOD_ID, "respond_teleport")
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, RespondTeleportPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
