@@ -1,4 +1,6 @@
 .gradle/
+.gradle-user-home/
+.probe/
 build/
 */build/
 run/
@@ -9,3 +11,6 @@ out/
 .idea/
 *.iml
 .vscode/
+
+.gradle-parent/
+tests/__pycache__/

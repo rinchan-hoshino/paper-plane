@@ -1,39 +1,37 @@
 plugins {
-    id 'fabric-loom' version '1.11.8' apply false
-    id 'net.neoforged.moddev' version '2.0.91' apply false
+    id 'java'
+}
+
+allprojects {
+    group = mod_group_id
+    version = mod_version
+
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.ftb.dev/releases' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.neoforged.net/releases' }
+        maven { url = 'https://maven.fabricmc.net/' }
+    }
 }
 
 subprojects {
-    group = rootProject.mod_group_id
-    version = rootProject.mod_version
+    apply plugin: 'java'
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url = 'https://maven.neoforged.net/releases' }
-        exclusiveContent {
-            forRepository { maven { url = 'https://maven.fabricmc.net/' } }
-            filter { includeGroupByRegex 'net\\.fabricmc(\\..*)?' }
-        }
-        exclusiveContent {
-            forRepository { maven { url = 'https://maven.ftb.dev/releases' } }
-            filter { includeGroup 'dev.ftb.mods' }
-        }
-        exclusiveContent {
-            forRepository { maven { url = 'https://maven.architectury.dev/' } }
-            filter { includeGroup 'dev.architectury' }
-        }
-        maven { url = 'https://cursemaven.com' }
-        exclusiveContent {
-            forRepository { maven { url = 'https://api.modrinth.com/maven' } }
-            filter { includeGroup 'maven.modrinth' }
-        }
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 17
     }
 
-    plugins.withType(JavaPlugin).configureEach {
-        java.toolchain.languageVersion = JavaLanguageVersion.of(rootProject.java_version as int)
-        tasks.withType(JavaCompile).configureEach {
-            options.encoding = 'UTF-8'
-        }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.11.4')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
     }
 }

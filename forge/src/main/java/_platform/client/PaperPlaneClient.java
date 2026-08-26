@@ -7,8 +7,8 @@ import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 
 public final class PaperPlaneClient {
     private static final Set<UUID> TRACKED_REQUESTS = new HashSet<>();

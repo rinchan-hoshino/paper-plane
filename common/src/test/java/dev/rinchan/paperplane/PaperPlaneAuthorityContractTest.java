@@ -30,7 +30,7 @@ final class PaperPlaneAuthorityContractTest {
     @Test
     void paymentWrapsFtbAcceptanceAndNetworkFailuresAreLogged() throws Exception {
         String mixin = Files.readString(source("dev/rinchan/paperplane/mixin/TPACommandMixin.java"));
-        String platform = Files.readString(source("dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"));
+        String platform = Files.readString(source("dev/rinchan/paperplane/PaperPlaneNetworking.java"));
         assertTrue(mixin.contains("@WrapMethod(method = \"tpaccept\")"));
         assertTrue(mixin.contains("acceptTeleportRequest"));
         assertFalse(platform.contains(".optional()"));

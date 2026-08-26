@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 
 public final class PaperPlaneRegistries {
     private static Item normal;
@@ -30,9 +29,9 @@ public final class PaperPlaneRegistries {
     public static void register() {
         normal = Registry.register(BuiltInRegistries.ITEM, id("paper_plane"), new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.NORMAL));
         soggy = Registry.register(BuiltInRegistries.ITEM, id("soggy_paper_plane"), new SoggyPaperPlaneItem(new Item.Properties().stacksTo(16)));
-        ender = Registry.register(BuiltInRegistries.ITEM, id("ender_paper_plane"), new PaperPlaneItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), PlaneKind.ENDER));
-        entity = Registry.register(BuiltInRegistries.ENTITY_TYPE, id("paper_plane"), EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC).sized(0.35F, 0.15F).clientTrackingRange(4).updateInterval(10).build(PaperPlane.MOD_ID + ":paper_plane"));
+        ender = Registry.register(BuiltInRegistries.ITEM, id("ender_paper_plane"), new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.ENDER));
+        entity = Registry.register(BuiltInRegistries.ENTITY_TYPE, id("paper_plane"), EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC).sized(0.5F, 0.125F).clientTrackingRange(8).updateInterval(1).build(PaperPlane.MOD_ID + ":paper_plane"));
     }
 
-    private static ResourceLocation id(String path) { return ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, path); }
+    private static ResourceLocation id(String path) { return new ResourceLocation(PaperPlane.MOD_ID, path); }
 }

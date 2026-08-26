@@ -3,7 +3,9 @@ package dev.rinchan.paperplane.item;
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.PaperPlaneFlightModel;
 import dev.rinchan.paperplane.PlaneKind;
+import dev.rinchan.paperplane.client.PaperPlaneClientItemExtensions;
 import dev.rinchan.paperplane.entity.PaperPlaneEntity;
+import java.util.function.Consumer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -44,19 +46,26 @@ public class PaperPlaneItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return USE_DURATION;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public void initializeClient(Consumer consumer) {
+        consumer.accept(PaperPlaneClientItemExtensions.INSTANCE);
     }
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
-        int chargeTicks = getUseDuration(stack, entity) - timeLeft;
+        int chargeTicks = getUseDuration(stack) - timeLeft;
         if (!PaperPlaneFlightModel.canLaunch(chargeTicks) || !(entity instanceof Player player)) {
             return;
         }
         if (!level.isClientSide()) {
             PaperPlaneEntity plane = new PaperPlaneEntity(level, player, planeKind == PlaneKind.ENDER);
-            plane.setItem(stack.copyWithCount(1));
+            ItemStack thrownStack = stack.copy();
+            thrownStack.setCount(1);
+            plane.setItem(thrownStack);
             plane.shootFromRotation(
                 player,
                 player.getXRot(),

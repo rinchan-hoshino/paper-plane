@@ -1,25 +1,18 @@
 package dev.rinchan.paperplane;
 
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
-public record TrackTeleportRequestPacket(UUID requestId, boolean active) implements CustomPacketPayload {
-    public static final Type<TrackTeleportRequestPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, "track_teleport_request"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, TrackTeleportRequestPacket> CODEC = StreamCodec.composite(
-        UUIDUtil.STREAM_CODEC,
-        TrackTeleportRequestPacket::requestId,
-        ByteBufCodecs.BOOL,
-        TrackTeleportRequestPacket::active,
-        TrackTeleportRequestPacket::new
-    );
+public record TrackTeleportRequestPacket(UUID requestId, boolean active) {
+    public static final ResourceLocation ID = new ResourceLocation(PaperPlane.MOD_ID, "track_teleport_request");
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public static TrackTeleportRequestPacket decode(FriendlyByteBuf buffer) {
+        return new TrackTeleportRequestPacket(buffer.readUUID(), buffer.readBoolean());
+    }
+
+    public void encode(FriendlyByteBuf buffer) {
+        buffer.writeUUID(requestId);
+        buffer.writeBoolean(active);
     }
 }

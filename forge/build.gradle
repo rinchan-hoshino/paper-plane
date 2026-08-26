@@ -1,0 +1,112 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.42'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'maven-publish'
+
+base {
+    archivesName = "${rootProject.mod_id}-forge"
+}
+
+jarJar.enable()
+
+minecraft {
+    mappings channel: 'official', version: rootProject.minecraft_version
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir rootProject.file('common/src/main/java')
+            exclude 'dev/rinchan/paperplane/neoforge/**'
+            exclude 'dev/rinchan/paperplane/PaperPlaneNetworking.java'
+            exclude 'dev/rinchan/paperplane/registry/PaperPlaneRegistries.java'
+            exclude 'dev/rinchan/paperplane/client/PaperPlaneClient.java'
+            exclude 'dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java'
+        }
+        resources.srcDir rootProject.file('common/src/main/resources')
+    }
+}
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
+    implementation(fg.deobf("dev.architectury:architectury-forge:11.1.17")) { transitive = false }
+    implementation(fg.deobf("dev.ftb.mods:ftb-library-forge:${rootProject.ftb_library_version}")) { transitive = false }
+    implementation(fg.deobf("dev.ftb.mods:ftb-essentials-forge:${rootProject.ftb_essentials_version}")) { transitive = false }
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
+    jarJar("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}") {
+        jarJar.ranged(it, "[${rootProject.mixin_extras_version},0.5)")
+    }
+}
+
+mixin {
+    add sourceSets.main, 'paper_plane.refmap.json'
+    config 'paper_plane.mixins.json'
+}
+
+processResources {
+    var replaceProperties = [
+        minecraft_version_range: minecraft_version_range,
+        forge_version_range: forge_version_range,
+        loader_version_range: '[49,)',
+        mod_id: mod_id,
+        mod_name: mod_name,
+        mod_license: mod_license,
+        mod_version: mod_version,
+        mod_authors: mod_authors,
+        mod_description: mod_description,
+        ftb_library_version_range: ftb_library_version_range,
+        ftb_essentials_version_range: ftb_essentials_version_range
+    ]
+    inputs.properties replaceProperties
+    filesMatching('META-INF/mods.toml') {
+        expand replaceProperties
+    }
+}
+
+jar {
+    manifest.attributes('MixinConfigs': 'paper_plane.mixins.json')
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${base.archivesName.get()}" }
+    }
+    finalizedBy 'reobfJar'
+}
+
+tasks.matching { it.name.startsWith('configureReobfTaskFor') }.configureEach {
+    doLast {
+        def mixinMappings = layout.buildDirectory.file('tmp/compileJava/compileJava-mappings.tsrg').get().asFile
+        if (mixinMappings.isFile() && mixinMappings.length() == 0L) {
+            // MixinGradle emits an empty file when the refmap needs no class-member remaps;
+            // ForgeGradle's mapping parser still requires a valid TSRG header.
+            mixinMappings.text = 'tsrg2 left right\n'
+        }
+    }
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('jarJar')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${rootProject.mod_id}-forge"
+            artifact jar
+        }
+    }
+}

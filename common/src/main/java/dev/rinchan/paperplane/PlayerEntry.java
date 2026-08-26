@@ -1,17 +1,15 @@
 package dev.rinchan.paperplane;
 
 import java.util.UUID;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public record PlayerEntry(UUID id, String name) {
-    public static final StreamCodec<RegistryFriendlyByteBuf, PlayerEntry> CODEC = StreamCodec.composite(
-        UUIDUtil.STREAM_CODEC,
-        PlayerEntry::id,
-        ByteBufCodecs.STRING_UTF8,
-        PlayerEntry::name,
-        PlayerEntry::new
-    );
+    public static PlayerEntry decode(FriendlyByteBuf buffer) {
+        return new PlayerEntry(buffer.readUUID(), buffer.readUtf(64));
+    }
+
+    public void encode(FriendlyByteBuf buffer) {
+        buffer.writeUUID(id);
+        buffer.writeUtf(name, 64);
+    }
 }

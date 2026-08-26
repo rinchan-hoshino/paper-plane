@@ -1,4 +1,4 @@
-package dev.rinchan.paperplane.neoforge;
+package dev.rinchan.paperplane.forge;
 
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.PaperPlaneNetworking;
@@ -6,25 +6,24 @@ import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(PaperPlane.MOD_ID)
-public final class PaperPlaneNeoForge {
-    public PaperPlaneNeoForge(IEventBus modBus) {
+public final class PaperPlaneForge {
+    public PaperPlaneForge() {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         PaperPlaneRegistries.register(modBus);
+        PaperPlaneNetworking.register();
         modBus.addListener(this::addCreativeTabContents);
-        modBus.addListener(this::registerPayloads);
-        NeoForge.EVENT_BUS.addListener(this::playerLoggedOut);
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            PaperPlaneClient.register(modBus);
-        }
+        MinecraftForge.EVENT_BUS.addListener(this::playerLoggedOut);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> PaperPlaneClient.register(modBus));
     }
 
     private void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
@@ -33,10 +32,6 @@ public final class PaperPlaneNeoForge {
             event.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
         }
-    }
-
-    private void registerPayloads(RegisterPayloadHandlerEvent event) {
-        PaperPlaneNetworking.register(event.registrar(PaperPlane.MOD_ID));
     }
 
     private void playerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {

@@ -52,8 +52,8 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected double getDefaultGravity() {
-        return 0.0D;
+    protected float getGravity() {
+        return 0.0F;
     }
 
     @Override

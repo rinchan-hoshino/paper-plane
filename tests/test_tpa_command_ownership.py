@@ -54,11 +54,11 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         self.assertIn("ClientPacketListenerMixin", mixin_config["client"])
 
     def test_server_payload_calls_ftb_backend_directly(self) -> None:
-        entrypoint = (
-            COMMON / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
+        networking = (
+            COMMON / "java/dev/rinchan/paperplane/PaperPlaneNetworking.java"
         ).read_text(encoding="utf-8")
-        self.assertIn("RespondTeleportPacket.TYPE", entrypoint)
-        self.assertIn("PaperPlane.respondToTeleportRequest", entrypoint)
+        self.assertIn("RespondTeleportPacket.ID", networking)
+        self.assertIn("PaperPlane.respondToTeleportRequest", networking)
 
         source = (COMMON / "java/dev/rinchan/paperplane/PaperPlane.java").read_text(
             encoding="utf-8"
@@ -76,7 +76,7 @@ class TpaCommandOwnershipTest(unittest.TestCase):
                 properties[key] = value
         self.assertEqual("1.0.0", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
-        self.assertEqual("8442866", properties["ftb_essentials_file_id"])
+        self.assertEqual("2004.1.3", properties["ftb_essentials_version"])
 
 
 if __name__ == "__main__":
