@@ -39,17 +39,3 @@ type = "required"
 versionRange = "${ftb_essentials_version_range}"
 ordering = "AFTER"
 side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "lychee"
-type = "required"
-versionRange = "${lychee_version_range}"
-ordering = "AFTER"
-side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "kiwi"
-type = "required"
-versionRange = "${kiwi_version_range}"
-ordering = "AFTER"
-side = "BOTH"

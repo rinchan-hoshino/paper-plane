@@ -5,7 +5,7 @@ Paper Plane turns folded paper into a server-authoritative TPA interface and a c
 ## Items
 
 - **Paper Plane** — crafted from five paper, stacks to 16.
-- **Soggy Paper Plane** — produced when a normal plane remains in water through Lychee, stacks to 16, and cannot fly.
+- **Soggy Paper Plane** — produced when a dropped normal plane enters water, stacks to 16, and cannot fly.
 - **Ender Paper Plane** — a normal plane surrounded by eight ender pearls, stacks to one, is uncommon, and is reusable.
 
 ## Teleport requests
@@ -41,10 +41,8 @@ There is no Paper Plane config file, command, capability, attachment, player Sav
 - NeoForge
 - FTB Library
 - FTB Essentials
-- Lychee
-- Kiwi
 - Architectury API (required by the FTB stack)
 
 ## Support
 
-Paper Plane 1.0.0 follows its required dependency stack across Minecraft 1.20.1 Fabric/Forge, 1.21.1 Fabric/NeoForge, and 26.1.2 Fabric/NeoForge. Minecraft 1.21.11 is excluded because Lychee/Kiwi are unavailable; Minecraft 26.2 is excluded because FTB Library/Essentials are unavailable.
+Paper Plane 1.0.0 follows every stable FTB Library / FTB Essentials target: Minecraft 1.19.2 Fabric/Forge; 1.20.1 Fabric/Forge; 1.20.4 Fabric/Forge/NeoForge; and 1.20.6, 1.21, 1.21.1, 1.21.11 and 26.1.2 on Fabric/NeoForge. Snapshot-only dependency generations are not formal targets.

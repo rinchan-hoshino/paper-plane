@@ -1,7 +1,0 @@
-{
-  "type": "lychee:item_inside",
-  "item_in": "paper_plane:paper_plane",
-  "block_in": "water",
-  "time": 1,
-  "post": "drop paper_plane:soggy_paper_plane"
-}

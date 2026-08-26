@@ -17,9 +17,6 @@
     "minecraft": "1.21.1",
     "fabric-api": "*",
     "ftblibrary": ">=2101.1.31 <2102",
-    "ftbessentials": ">=2101.1.5 <2102",
-    "lychee": ">=6.4.4",
-    "kiwi": ">=15.7.5",
-    "architectury": ">=13"
+    "ftbessentials": ">=2101.1.5 <2102"
   }
 }

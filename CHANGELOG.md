@@ -3,7 +3,8 @@
 ## 1.0.0
 
 - Promotes the server-authoritative request, atomic payment, two-second charging pose, deterministic glide physics and corrected hand transforms to the stable public contract.
-- Publishes every Fabric/Forge-family target where the complete required dependency stack exists: Minecraft 1.20.1 Fabric/Forge, 1.21.1 Fabric/NeoForge, and 26.1.2 Fabric/NeoForge.
+- Publishes all 17 stable FTB Library / FTB Essentials targets from Minecraft 1.19.2 through 26.1.2 across Fabric, Forge and NeoForge.
+- Replaces the Lychee/Kiwi water recipe with an owned single-transition item-water boundary so auxiliary dependencies cannot truncate support.
 
 ## 0.1.9
 

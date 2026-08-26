@@ -43,6 +43,16 @@ final class PaperPlaneAuthorityContractTest {
     }
 
     @Test
+    void droppedPlanesOwnTheirSingleWaterTransition() throws Exception {
+        String wetting = Files.readString(source("dev/rinchan/paperplane/mixin/ItemEntityMixin.java"));
+        String mixins = Files.readString(resource("paper_plane.mixins.json"));
+        assertTrue(wetting.contains("stack.is(PaperPlaneRegistries.PAPER_PLANE.get())"));
+        assertTrue(wetting.contains("SOGGY_PAPER_PLANE"));
+        assertTrue(mixins.contains("ItemEntityMixin"));
+        assertFalse(Files.exists(resource("data/paper_plane/recipe/soggy_paper_plane.json")));
+    }
+
+    @Test
     void chargingUsesMouthPoseAndWorldEntityIsNotCameraBillboarded() throws Exception {
         String item = Files.readString(source("dev/rinchan/paperplane/item/PaperPlaneItem.java"));
         String renderer = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneEntityRenderer.java"));

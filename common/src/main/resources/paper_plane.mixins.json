@@ -4,6 +4,7 @@
   "package": "dev.rinchan.paperplane.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ItemEntityMixin",
     "TPACommandMixin"
   ],
   "client": [
