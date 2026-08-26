@@ -1,40 +1,53 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
     id 'fabric-loom'
 }
 
 def root = rootProject
 
-base { archivesName = "${root.mod_id}-fabric" }
+base { archivesName = "${root.mod_id}-${root.targetMinecraft}-fabric" }
 
 sourceSets.main.java {
     srcDir root.file('common/src/main/java')
-    exclude 'dev/rinchan/paperplane/PaperPlaneNetworking.java'
-    exclude 'dev/rinchan/paperplane/client/PaperPlaneClient.java'
-    exclude 'dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java'
-    exclude 'dev/rinchan/paperplane/neoforge/**'
-    exclude 'dev/rinchan/paperplane/registry/PaperPlaneRegistries.java'
+    srcDir root.file("versions/${root.targetMinecraft}/src/main/java")
+    srcDir "src/${root.targetMinecraft}/java"
 }
 sourceSets.main.resources.srcDir root.file('common/src/main/resources')
+sourceSets.test.java.srcDir root.file('common/src/test/java')
 
-loom { mixin { defaultRefmapName.set("${root.mod_id}.refmap.json") } }
+loom {
+    mixin { defaultRefmapName.set("${root.mod_id}.refmap.json") }
+}
 
 dependencies {
-    minecraft "com.mojang:minecraft:${root.minecraft_version}"
+    minecraft "com.mojang:minecraft:${root.targetMinecraft}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${root.fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_api_version}"
-    modImplementation("dev.ftb.mods:ftb-library-fabric:${root.ftb_library_fabric_version}") { transitive = false }
-    modImplementation("dev.ftb.mods:ftb-essentials-fabric:${root.ftb_essentials_fabric_version}") { transitive = false }
-    implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1"))
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${root.profile.fabricApiVersion}"
+    modImplementation("dev.architectury:architectury-fabric:${root.profile.architecturyVersion}") { transitive = false }
+    modImplementation("dev.ftb.mods:ftb-library-fabric:${root.profile.ftbLibraryVersion}") { transitive = false }
+    modImplementation("dev.ftb.mods:ftb-essentials-fabric:${root.profile.ftbEssentialsVersion}") { transitive = false }
+    implementation(include("io.github.llamalad7:mixinextras-fabric:${root.mixin_extras_version}"))
+
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
-def releaseVersion = root.mod_version
-def fabricArtifactId = "${root.mod_id}-fabric"
+tasks.named('test', Test).configure { useJUnitPlatform() }
+
 processResources {
-    inputs.property 'version', releaseVersion
-    filesMatching('fabric.mod.json') { expand(version: releaseVersion) }
+    inputs.properties([
+        version: root.mod_version,
+        minecraft_version: root.targetMinecraft,
+        ftb_library_range: root.profile.ftbLibraryRange,
+        ftb_essentials_range: root.profile.ftbEssentialsRange
+    ])
+    filesMatching('fabric.mod.json') {
+        expand(
+            version: root.mod_version,
+            minecraft_version: root.targetMinecraft,
+            ftb_library_range: root.profile.ftbLibraryRange,
+            ftb_essentials_range: root.profile.ftbEssentialsRange
+        )
+    }
 }
-
-publishing { publications { mavenJava(MavenPublication) { artifactId = fabricArtifactId; from components.java } } }

@@ -1,0 +1,96 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.54'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+def root = rootProject
+
+base { archivesName = "${root.mod_id}-${root.targetMinecraft}-forge" }
+
+sourceSets.main.java {
+    srcDir root.file('common/src/main/java')
+    srcDir root.file("versions/${root.targetMinecraft}/src/main/java")
+    srcDir "src/${root.targetMinecraft}/java"
+}
+sourceSets.main.resources {
+    srcDir root.file('common/src/main/resources')
+    srcDir layout.buildDirectory.dir('generated/resources')
+}
+sourceSets.test.java.srcDir root.file('common/src/test/java')
+
+minecraft {
+    mappings channel: 'official', version: root.targetMinecraft
+    copyIdeResources = true
+}
+
+mixin {
+    add sourceSets.main, 'paper_plane.refmap.json'
+    config 'paper_plane.mixins.json'
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def values = [
+        mod_id: root.mod_id,
+        mod_name: root.mod_name,
+        mod_license: root.mod_license,
+        mod_version: root.mod_version,
+        mod_authors: root.mod_authors,
+        mod_description: root.mod_description,
+        minecraft_version_range: root.profile.minecraftRange,
+        forge_version_range: root.profile.forgeRange,
+        ftb_library_version_range: root.profile.ftbLibraryRange,
+        ftb_essentials_version_range: root.profile.ftbEssentialsRange
+    ]
+    inputs.properties(values)
+    filteringCharset = 'UTF-8'
+    from 'src/main/templates'
+    expand values
+    into layout.buildDirectory.dir('generated/resources')
+}
+processResources.dependsOn(generateModMetadata)
+
+jarJar.enable()
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${root.targetMinecraft}-${root.profile.forgeVersion}"
+    implementation("dev.architectury:architectury-forge:${root.profile.architecturyVersion}") { transitive = false }
+    implementation("dev.ftb.mods:ftb-library-forge:${root.profile.ftbLibraryVersion}") { transitive = false }
+    implementation("dev.ftb.mods:ftb-essentials-forge:${root.profile.ftbEssentialsVersion}") { transitive = false }
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${root.mixin_extras_version}"))
+    jarJar("io.github.llamalad7:mixinextras-forge:${root.mixin_extras_version}") {
+        jarJar.ranged(it, "[${root.mixin_extras_version},0.6)")
+    }
+
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+tasks.named('test', Test).configure { useJUnitPlatform() }
+
+tasks.named('jar', Jar).configure {
+    manifest.attributes([
+        'Specification-Title': root.mod_id,
+        'Specification-Vendor': root.mod_authors,
+        'Specification-Version': '1',
+        'Implementation-Title': project.name,
+        'Implementation-Version': project.version,
+        'Implementation-Vendor': root.mod_authors,
+        'MixinConfigs': 'paper_plane.mixins.json'
+    ])
+    finalizedBy 'reobfJar'
+}
+
+tasks.named('build').configure { dependsOn tasks.named('jarJar') }

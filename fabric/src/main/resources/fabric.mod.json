@@ -13,10 +13,11 @@
   },
   "mixins": ["paper_plane.mixins.json"],
   "depends": {
-    "fabricloader": ">=0.16.14",
-    "minecraft": "1.21.1",
+    "fabricloader": ">=0.14.9",
+    "minecraft": "${minecraft_version}",
     "fabric-api": "*",
-    "ftblibrary": ">=2101.1.31 <2102",
-    "ftbessentials": ">=2101.1.5 <2102"
+    "architectury": "*",
+    "ftblibrary": "${ftb_library_range}",
+    "ftbessentials": "${ftb_essentials_range}"
   }
 }

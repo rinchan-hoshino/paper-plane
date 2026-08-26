@@ -1,27 +1,18 @@
 package dev.rinchan.paperplane.fabric;
 
-import dev.rinchan.paperplane.*;
+import dev.rinchan.paperplane.PaperPlane;
+import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public final class PaperPlaneFabric implements ModInitializer {
-    @Override public void onInitialize() {
+    @Override
+    public void onInitialize() {
         PaperPlaneRegistries.register();
-        PayloadTypeRegistry.playC2S().register(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC);
-        PayloadTypeRegistry.playC2S().register(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(RequestTeleportPacket.TYPE, (packet, context) -> context.server().execute(() -> {
-            try { PaperPlane.requestTeleport(context.player(), packet.sessionId(), packet.targetId()); }
-            catch (Throwable failure) { PaperPlane.LOGGER.error("Failed to request teleport", failure); }
-        }));
-        ServerPlayNetworking.registerGlobalReceiver(RespondTeleportPacket.TYPE, (packet, context) -> context.server().execute(() -> {
-            try { PaperPlane.respondToTeleportRequest(context.player(), packet.requestId(), packet.accept()); }
-            catch (Throwable failure) { PaperPlane.LOGGER.error("Failed to respond to teleport request", failure); }
-        }));
+        PaperPlaneFabricCreativeTabs.register();
+        PaperPlaneNetworking.registerServer();
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> PaperPlane.clearPlayer(handler.player));
+        PaperPlane.LOGGER.info("Paper Plane initialized on Fabric");
     }
 }

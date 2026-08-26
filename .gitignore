@@ -1,9 +1,15 @@
 .gradle/
+.gradle-user-home/
+**/.gradle/
+**/.gradle-user-home/
 build/
 */build/
 run/
 */run/
 out/
+__pycache__/
+**/__pycache__/
+*.py[cod]
 *.log
 *.hprof
 .idea/

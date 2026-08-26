@@ -13,7 +13,7 @@ public abstract class ItemEntityMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void paperPlane$becomeSoggyInWater(CallbackInfo ci) {
         ItemEntity item = (ItemEntity) (Object) this;
-        if (item.level().isClientSide() || !item.isInWater()) {
+        if (item.getCommandSenderWorld().isClientSide() || !item.isInWater()) {
             return;
         }
         ItemStack stack = item.getItem();

@@ -32,10 +32,10 @@ public class PaperPlaneItem extends Item {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(stack);
         }
-        if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             PaperPlane.openTeleportScreen(serverPlayer, planeKind);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 
     @Override
@@ -44,19 +44,21 @@ public class PaperPlaneItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return USE_DURATION;
     }
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
-        int chargeTicks = getUseDuration(stack, entity) - timeLeft;
+        int chargeTicks = getUseDuration(stack) - timeLeft;
         if (!PaperPlaneFlightModel.canLaunch(chargeTicks) || !(entity instanceof Player player)) {
             return;
         }
-        if (!level.isClientSide()) {
+        if (!level.isClientSide) {
             PaperPlaneEntity plane = new PaperPlaneEntity(level, player, planeKind == PlaneKind.ENDER);
-            plane.setItem(stack.copyWithCount(1));
+            ItemStack thrown = stack.copy();
+            thrown.setCount(1);
+            plane.setItem(thrown);
             plane.shootFromRotation(
                 player,
                 player.getXRot(),
@@ -72,5 +74,4 @@ public class PaperPlaneItem extends Item {
             }
         }
     }
-
 }

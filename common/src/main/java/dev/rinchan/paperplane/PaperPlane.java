@@ -1,7 +1,6 @@
 package dev.rinchan.paperplane;
 
-import dev.ftb.mods.ftbessentials.api.records.TPARequest;
-import dev.ftb.mods.ftbessentials.commands.impl.teleporting.TPACommand;
+import dev.ftb.mods.ftbessentials.command.TPACommands;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +10,7 @@ import java.util.UUID;
 import java.util.function.IntSupplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,6 @@ public final class PaperPlane {
     public static final String MOD_ID = "paper_plane";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final long SELECTION_SESSION_TICKS = 20L * 30L;
-    private static final TPACommand FTB_TPA = new TPACommand();
     private static final TeleportRequestLedger REQUESTS = new TeleportRequestLedger();
     private static final Map<UUID, SelectionSession> SELECTIONS = new HashMap<>();
 
@@ -32,7 +31,7 @@ public final class PaperPlane {
         reconcilePending(player);
         Optional<TeleportRequestLedger.Pending> pending = REQUESTS.pendingFor(player.getUUID());
         if (pending.isPresent()) {
-            ServerPlayer target = player.server.getPlayerList().getPlayer(pending.get().targetId());
+            ServerPlayer target = server(player).getPlayerList().getPlayer(pending.get().targetId());
             String name = target == null ? pending.get().targetId().toString() : target.getGameProfile().getName();
             player.sendSystemMessage(Component.translatable("message.paper_plane.pending", name).withStyle(ChatFormatting.YELLOW));
             return;
@@ -43,17 +42,17 @@ public final class PaperPlane {
         }
 
         UUID sessionId = UUID.randomUUID();
-        long expiresAt = player.serverLevel().getGameTime() + SELECTION_SESSION_TICKS;
+        long expiresAt = player.getCommandSenderWorld().getGameTime() + SELECTION_SESSION_TICKS;
         SELECTIONS.put(player.getUUID(), new SelectionSession(sessionId, planeKind, expiresAt));
         PaperPlaneNetworking.sendToPlayer(
             player,
-            PaperPlaneNetworking.playerListPacket(player.server, player.getUUID(), sessionId, planeKind)
+            PaperPlaneNetworking.playerListPacket(server(player), player.getUUID(), sessionId, planeKind)
         );
     }
 
     public static void requestTeleport(ServerPlayer requester, UUID sessionId, UUID targetId) {
         SelectionSession session = SELECTIONS.remove(requester.getUUID());
-        if (session == null || !session.sessionId().equals(sessionId) || requester.serverLevel().getGameTime() > session.expiresAt()) {
+        if (session == null || !session.sessionId().equals(sessionId) || requester.getCommandSenderWorld().getGameTime() > session.expiresAt()) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.selection_expired").withStyle(ChatFormatting.RED));
             return;
         }
@@ -64,7 +63,7 @@ public final class PaperPlane {
             return;
         }
 
-        ServerPlayer target = requester.server.getPlayerList().getPlayer(targetId);
+        ServerPlayer target = server(requester).getPlayerList().getPlayer(targetId);
         if (target == null) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.target_offline").withStyle(ChatFormatting.RED));
             return;
@@ -78,50 +77,52 @@ public final class PaperPlane {
             return;
         }
 
-        Set<UUID> before = Set.copyOf(TPACommand.requests().keySet());
-        int result = FTB_TPA.tpa(requester, target, false);
+        Set<String> before = Set.copyOf(TPACommands.REQUESTS.keySet());
+        int result = TPACommands.tpa(requester, target, false);
         if (result <= 0) {
             return;
         }
 
-        TPARequest request = findNewFtbRequest(requester, target, before);
-        if (request == null) {
-            LOGGER.error("FTB Essentials accepted a paper-plane TPA request but exposed no new request id for {} -> {}", requester.getUUID(), targetId);
+        String requestId = findNewFtbRequest(before);
+        if (requestId == null) {
+            LOGGER.error("FTB Essentials accepted a Paper Plane TPA request but exposed no unique request id for {} -> {}", requester.getUUID(), targetId);
             return;
         }
 
-        TeleportRequestLedger.Pending pending = new TeleportRequestLedger.Pending(
-            request.id(), requester.getUUID(), targetId, session.planeKind()
+        TeleportRequestLedger.Pending pendingRequest = new TeleportRequestLedger.Pending(
+            requestId, requester.getUUID(), targetId, session.planeKind()
         );
-        if (!REQUESTS.add(pending)) {
-            TPACommand.requests().remove(request.id());
+        if (!REQUESTS.add(pendingRequest)) {
+            TPACommands.REQUESTS.remove(requestId);
             LOGGER.error("Rejected duplicate Paper Plane pending state for requester {}", requester.getUUID());
             return;
         }
-        PaperPlaneNetworking.sendToPlayer(target, new TrackTeleportRequestPacket(request.id(), true));
+        PaperPlaneNetworking.sendToPlayer(target, new TrackTeleportRequestPacket(requestId, true));
     }
 
-    public static int respondToTeleportRequest(ServerPlayer target, UUID requestId, boolean accept) {
-        return accept ? FTB_TPA.tpaccept(target, requestId.toString()) : FTB_TPA.tpdeny(target, requestId.toString());
+    /** Only a server-tracked Paper Plane target may route an FTB response packet. */
+    public static int respondToTeleportRequest(ServerPlayer target, String requestId, boolean accept) {
+        Optional<TeleportRequestLedger.Pending> pending = REQUESTS.byRequest(requestId);
+        if (pending.isEmpty() || !pending.get().targetId().equals(target.getUUID())) {
+            return 0;
+        }
+        return accept ? TPACommands.tpaccept(target, requestId) : TPACommands.tpdeny(target, requestId);
     }
 
     public static int acceptTeleportRequest(ServerPlayer target, String requestId, IntSupplier operation) {
-        UUID id = parseRequestId(requestId);
-        if (id == null) {
-            return operation.getAsInt();
-        }
-        Optional<TeleportRequestLedger.Pending> found = REQUESTS.byRequest(id);
+        Optional<TeleportRequestLedger.Pending> found = REQUESTS.byRequest(requestId);
         if (found.isEmpty()) {
             return operation.getAsInt();
         }
 
         TeleportRequestLedger.Pending pending = found.get();
         if (!pending.targetId().equals(target.getUUID())) {
-            LOGGER.warn("Player {} tried to answer Paper Plane request {} owned by target {}", target.getUUID(), id, pending.targetId());
+            LOGGER.warn("Player {} tried to answer Paper Plane request {} owned by target {}", target.getUUID(), requestId, pending.targetId());
             return 0;
         }
 
-        ServerPlayer requester = target.server.getPlayerList().getPlayer(pending.requesterId());
+        MinecraftServer server = server(target);
+        ServerPlayer requester = server.getPlayerList().getPlayer(pending.requesterId());
         if (requester == null) {
             return operation.getAsInt();
         }
@@ -139,11 +140,11 @@ public final class PaperPlane {
         try {
             int result = operation.getAsInt();
             if (result > 0) {
-                clearRequest(target.server, id);
+                clearRequest(server, requestId);
             } else {
                 refund(requester, payment);
-                if (!TPACommand.requests().containsKey(id)) {
-                    clearRequest(target.server, id);
+                if (!TPACommands.REQUESTS.containsKey(requestId)) {
+                    clearRequest(server, requestId);
                 }
             }
             return result;
@@ -153,49 +154,51 @@ public final class PaperPlane {
         }
     }
 
-    public static void forgetDeniedRequest(ServerPlayer target, UUID requestId, int result) {
+    public static void forgetDeniedRequest(ServerPlayer target, String requestId, int result) {
         if (result > 0) {
             REQUESTS.byRequest(requestId)
                 .filter(pending -> pending.targetId().equals(target.getUUID()))
-                .ifPresent(pending -> clearRequest(target.server, requestId));
+                .ifPresent(pending -> clearRequest(server(target), requestId));
         }
     }
 
     public static void clearPlayer(ServerPlayer player) {
         SELECTIONS.remove(player.getUUID());
+        MinecraftServer server = server(player);
         for (TeleportRequestLedger.Pending pending : REQUESTS.removePlayer(player.getUUID())) {
-            TPACommand.requests().remove(pending.requestId());
-            notifyTracking(player.server, pending, false);
+            TPACommands.REQUESTS.remove(pending.requestId());
+            notifyTracking(server, pending, false);
         }
     }
 
     private static void reconcilePending(ServerPlayer player) {
         REQUESTS.pendingFor(player.getUUID())
-            .filter(pending -> !TPACommand.requests().containsKey(pending.requestId()))
-            .ifPresent(pending -> clearRequest(player.server, pending.requestId()));
+            .filter(pending -> !TPACommands.REQUESTS.containsKey(pending.requestId()))
+            .ifPresent(pending -> clearRequest(server(player), pending.requestId()));
     }
 
-    private static void clearRequest(net.minecraft.server.MinecraftServer server, UUID requestId) {
+    private static void clearRequest(MinecraftServer server, String requestId) {
         REQUESTS.remove(requestId).ifPresent(pending -> notifyTracking(server, pending, false));
     }
 
-    private static void notifyTracking(net.minecraft.server.MinecraftServer server, TeleportRequestLedger.Pending pending, boolean active) {
+    private static void notifyTracking(MinecraftServer server, TeleportRequestLedger.Pending pending, boolean active) {
         ServerPlayer target = server.getPlayerList().getPlayer(pending.targetId());
         if (target != null) {
             PaperPlaneNetworking.sendToPlayer(target, new TrackTeleportRequestPacket(pending.requestId(), active));
         }
     }
 
-    private static TPARequest findNewFtbRequest(ServerPlayer requester, ServerPlayer target, Set<UUID> before) {
-        for (TPARequest request : TPACommand.requests().values()) {
-            if (!before.contains(request.id())
-                && request.source().getUuid().equals(requester.getUUID())
-                && request.target().getUuid().equals(target.getUUID())
-                && !request.here()) {
-                return request;
+    private static String findNewFtbRequest(Set<String> before) {
+        String found = null;
+        for (String requestId : TPACommands.REQUESTS.keySet()) {
+            if (!before.contains(requestId)) {
+                if (found != null) {
+                    return null;
+                }
+                found = requestId;
             }
         }
-        return null;
+        return found;
     }
 
     private static ItemStack takePlane(ServerPlayer player, PlaneKind planeKind) {
@@ -230,12 +233,12 @@ public final class PaperPlane {
         return -1;
     }
 
-    private static UUID parseRequestId(String requestId) {
-        try {
-            return UUID.fromString(requestId);
-        } catch (IllegalArgumentException ignored) {
-            return null;
+    private static MinecraftServer server(ServerPlayer player) {
+        MinecraftServer server = player.getServer();
+        if (server == null) {
+            throw new IllegalStateException("Server player is not attached to a server");
         }
+        return server;
     }
 
     private record SelectionSession(UUID sessionId, PlaneKind planeKind, long expiresAt) {

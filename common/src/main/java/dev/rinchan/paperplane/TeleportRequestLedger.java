@@ -10,8 +10,8 @@ import java.util.UUID;
 
 /** Server-owned one-request-per-requester state. */
 public final class TeleportRequestLedger {
-    private final Map<UUID, Pending> byRequest = new LinkedHashMap<>();
-    private final Map<UUID, UUID> requestByRequester = new HashMap<>();
+    private final Map<String, Pending> byRequest = new LinkedHashMap<>();
+    private final Map<UUID, String> requestByRequester = new HashMap<>();
 
     public boolean add(Pending pending) {
         if (byRequest.containsKey(pending.requestId()) || requestByRequester.containsKey(pending.requesterId())) {
@@ -23,11 +23,11 @@ public final class TeleportRequestLedger {
     }
 
     public Optional<Pending> pendingFor(UUID requesterId) {
-        UUID requestId = requestByRequester.get(requesterId);
+        String requestId = requestByRequester.get(requesterId);
         return requestId == null ? Optional.empty() : Optional.ofNullable(byRequest.get(requestId));
     }
 
-    public Optional<Pending> byRequest(UUID requestId) {
+    public Optional<Pending> byRequest(String requestId) {
         return Optional.ofNullable(byRequest.get(requestId));
     }
 
@@ -35,7 +35,7 @@ public final class TeleportRequestLedger {
         return requestByRequester.containsKey(requesterId);
     }
 
-    public Optional<Pending> remove(UUID requestId) {
+    public Optional<Pending> remove(String requestId) {
         Pending pending = byRequest.remove(requestId);
         if (pending != null) {
             requestByRequester.remove(pending.requesterId(), requestId);
@@ -54,10 +54,10 @@ public final class TeleportRequestLedger {
         return removed;
     }
 
-    public record Pending(UUID requestId, UUID requesterId, UUID targetId, PlaneKind planeKind) {
+    public record Pending(String requestId, UUID requesterId, UUID targetId, PlaneKind planeKind) {
         public Pending {
-            if (requestId == null || requesterId == null || targetId == null || planeKind == null) {
-                throw new IllegalArgumentException("Pending request fields must be non-null");
+            if (requestId == null || requestId.isEmpty() || requesterId == null || targetId == null || planeKind == null) {
+                throw new IllegalArgumentException("Pending request fields must be non-null and request id must be non-empty");
             }
         }
     }

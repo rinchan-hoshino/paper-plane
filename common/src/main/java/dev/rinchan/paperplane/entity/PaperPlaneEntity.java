@@ -19,11 +19,13 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
 
     public PaperPlaneEntity(EntityType<? extends PaperPlaneEntity> type, Level level) {
         super(type, level);
+        setNoGravity(true);
     }
 
     public PaperPlaneEntity(Level level, LivingEntity owner, boolean enderPlane) {
         super(PaperPlaneRegistries.PAPER_PLANE_ENTITY.get(), owner, level);
         this.enderPlane = enderPlane;
+        setNoGravity(true);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
         setDeltaMovement(next.x(), next.y(), next.z());
         orientToVelocity();
         super.tick();
-        if (!level().isClientSide() && !resolved && !isRemoved() && isInWater()) {
+        if (!getCommandSenderWorld().isClientSide && !resolved && !isRemoved() && isInWater()) {
             resolveDrop(true);
         }
     }
@@ -46,14 +48,9 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!level().isClientSide() && !resolved) {
+        if (!getCommandSenderWorld().isClientSide && !resolved) {
             resolveDrop(false);
         }
-    }
-
-    @Override
-    protected double getDefaultGravity() {
-        return 0.0D;
     }
 
     @Override
@@ -71,6 +68,7 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         enderPlane = tag.getBoolean("EnderPlane");
+        setNoGravity(true);
     }
 
     private void orientToVelocity() {

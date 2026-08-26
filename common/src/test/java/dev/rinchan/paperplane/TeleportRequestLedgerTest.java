@@ -12,8 +12,8 @@ final class TeleportRequestLedgerTest {
         TeleportRequestLedger ledger = new TeleportRequestLedger();
         UUID requester = UUID.randomUUID();
         UUID first = UUID.randomUUID();
-        assertTrue(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID(), requester, first, PlaneKind.NORMAL)));
-        assertFalse(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID(), requester, UUID.randomUUID(), PlaneKind.ENDER)));
+        assertTrue(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID().toString(), requester, first, PlaneKind.NORMAL)));
+        assertFalse(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID().toString(), requester, UUID.randomUUID(), PlaneKind.ENDER)));
         assertTrue(ledger.pendingFor(requester).isPresent());
     }
 
@@ -22,11 +22,11 @@ final class TeleportRequestLedgerTest {
         TeleportRequestLedger ledger = new TeleportRequestLedger();
         UUID requester = UUID.randomUUID();
         UUID target = UUID.randomUUID();
-        UUID request = UUID.randomUUID();
+        String request = UUID.randomUUID().toString();
         ledger.add(new TeleportRequestLedger.Pending(request, requester, target, PlaneKind.SOGGY));
         ledger.remove(request);
         assertFalse(ledger.hasPending(requester));
-        assertTrue(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID(), requester, target, PlaneKind.NORMAL)));
+        assertTrue(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID().toString(), requester, target, PlaneKind.NORMAL)));
         assertTrue(ledger.removePlayer(target).size() == 1);
         assertFalse(ledger.hasPending(requester));
     }
