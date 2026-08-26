@@ -5142,7 +5142,7 @@
     "firstperson_righthand": {
       "rotation": [
         0,
-        45,
+        225,
         0
       ],
       "translation": [
@@ -5159,7 +5159,7 @@
     "firstperson_lefthand": {
       "rotation": [
         0,
-        225,
+        45,
         0
       ],
       "translation": [

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.9
+
+- Corrects right- and left-hand model rotations so the charging transform consistently points the plane nose back toward the player.
+
 ## 0.1.8
 
 - Adds a two-second sneak-use blowing pose and deterministic lift, drag, gravity, stall and glide physics.

@@ -13,6 +13,11 @@ final class PaperPlaneAuthorityContractTest {
         return Files.isRegularFile(direct) ? direct : Path.of("../common/src/main/java").resolve(relative).normalize();
     }
 
+    private static Path resource(String relative) {
+        Path direct = Path.of("common/src/main/resources").resolve(relative);
+        return Files.isRegularFile(direct) ? direct : Path.of("../common/src/main/resources").resolve(relative).normalize();
+    }
+
     @Test
     void clientCannotDeclarePlaneKindOrAnswerUntrackedCommands() throws Exception {
         String requestPacket = Files.readString(source("dev/rinchan/paperplane/RequestTeleportPacket.java"));
@@ -45,5 +50,10 @@ final class PaperPlaneAuthorityContractTest {
         assertTrue(item.contains("PaperPlaneFlightModel.launchSpeed"));
         assertTrue(renderer.contains("plane.getYRot()"));
         assertFalse(renderer.contains("cameraOrientation"));
+        String pose = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java"));
+        assertTrue(pose.contains("side > 0.0F ? -225.0F : -45.0F"));
+        String model = Files.readString(resource("assets/paper_plane/models/item/paper_plane.json"));
+        assertTrue(model.contains("\"firstperson_righthand\": {\n      \"rotation\": [\n        0,\n        225"));
+        assertTrue(model.contains("\"firstperson_lefthand\": {\n      \"rotation\": [\n        0,\n        45"));
     }
 }
