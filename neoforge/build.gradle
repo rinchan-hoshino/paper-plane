@@ -1,6 +1,4 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'net.neoforged.moddev'
 }
 
@@ -8,71 +6,96 @@ base {
     archivesName = "${rootProject.mod_id}-neoforge"
 }
 
-sourceSets.main.java.srcDir rootProject.file('common/src/main/java')
-sourceSets.main.resources.srcDir rootProject.file('common/src/main/resources')
-sourceSets.main.resources.srcDir tasks.register('generateModMetadata', ProcessResources) {
-    def replaceProperties = [
-        minecraft_version_range: rootProject.minecraft_version_range,
-        neo_version_range      : rootProject.neo_version_range,
-        loader_version_range   : rootProject.loader_version_range,
-        ftb_library_version_range: rootProject.ftb_library_version_range,
-        ftb_essentials_version_range: rootProject.ftb_essentials_version_range,
-        mod_id                 : rootProject.mod_id,
-        mod_name               : rootProject.mod_name,
-        mod_license            : rootProject.mod_license,
-        mod_version            : rootProject.mod_version,
-        mod_authors            : rootProject.mod_authors,
-        mod_description        : rootProject.mod_description
-    ]
-    inputs.properties replaceProperties
-    filteringCharset = 'UTF-8'
-    expand replaceProperties
-    from 'src/main/templates'
-    into layout.buildDirectory.dir('generated/sources/modMetadata')
+def profile = rootProject.versionProfile
+
+def generatedResourcesDirectory = layout.buildDirectory.dir('generated/resources/main')
+
+sourceSets {
+    main {
+        java.srcDir rootProject.file('common/src/main/java')
+        if (profile.minecraft_version == '1.20.6') {
+            java {
+                srcDir 'src/1.20.6/java'
+                exclude 'dev/rinchan/paperplane/client/PaperPlaneClient.java'
+                exclude 'dev/rinchan/paperplane/item/PaperPlaneItem.java'
+            }
+        }
+        resources.srcDir rootProject.file('common/src/main/resources')
+    }
+    test {
+        java.srcDir rootProject.file('common/src/test/java')
+    }
 }
 
 neoForge {
-    version = rootProject.neo_version
-    mods {
-        "${rootProject.mod_id}" {
-            sourceSet(sourceSets.main)
-        }
-    }
+    version = profile.neo_version
+
     runs {
-        client { client() }
+        client {
+            client()
+        }
         server {
             server()
             programArgument '--nogui'
         }
-        configureEach {
-            logLevel = org.slf4j.event.Level.INFO
+    }
+
+    mods {
+        paper_plane {
+            sourceSet sourceSets.main
         }
     }
 }
 
-neoForge.ideSyncTask tasks.named('generateModMetadata')
-
-sourceSets.test.java.srcDir rootProject.file('common/src/test/java')
-
 dependencies {
-    compileOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
-    compileOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
-    runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
-    runtimeOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
+    compileOnly("dev.ftb.mods:ftb-library-neoforge:${profile.ftb_library_version}") { transitive = false }
+    compileOnly("dev.ftb.mods:ftb-essentials-neoforge:${profile.ftb_essentials_version}") { transitive = false }
+    compileOnly("dev.architectury:architectury-neoforge:${profile.architectury_version}") { transitive = false }
+
+    implementation "io.github.llamalad7:mixinextras-neoforge:${rootProject.mixin_extras_version}"
+    jarJar "io.github.llamalad7:mixinextras-neoforge:${rootProject.mixin_extras_version}"
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+        minecraft_version_range: profile.minecraft_version_range,
+        neo_version_range: profile.neo_version_range,
+        loader_version_range: '[4,)',
+        mod_id: rootProject.mod_id,
+        mod_name: rootProject.mod_name,
+        mod_license: rootProject.mod_license,
+        mod_version: project.version,
+        mod_authors: rootProject.mod_authors,
+        mod_description: rootProject.mod_description,
+        ftb_library_version_range: profile.ftb_library_version_range_neoforge,
+        ftb_essentials_version_range: profile.ftb_essentials_version_range_neoforge
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into generatedResourcesDirectory
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+
+tasks.named('processResources') {
+    includeEmptyDirs = false
+    if (profile.minecraft_version == '1.20.6') {
+        eachFile { details ->
+            details.path = details.path.replace('/recipe/', '/recipes/')
+        }
+    }
 }
 
 tasks.named('test', Test).configure {
     useJUnitPlatform()
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "${rootProject.mod_id}-neoforge"
-            from components.java
-        }
+tasks.named('jar', Jar) {
+    from(rootProject.file('LICENSE')) {
+        rename { "LICENSE_${rootProject.mod_id}" }
     }
 }

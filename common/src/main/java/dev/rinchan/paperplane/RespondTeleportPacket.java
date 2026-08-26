@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public record RespondTeleportPacket(UUID requestId, boolean accept) implements CustomPacketPayload {
     public static final Type<RespondTeleportPacket> TYPE = new Type<>(
-        ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, "respond_teleport")
+        ResourceLocation.tryBuild(PaperPlane.MOD_ID, "respond_teleport")
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, RespondTeleportPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,

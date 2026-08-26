@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record TrackTeleportRequestPacket(UUID requestId, boolean active) implements CustomPacketPayload {
-    public static final Type<TrackTeleportRequestPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, "track_teleport_request"));
+    public static final Type<TrackTeleportRequestPacket> TYPE = new Type<>(ResourceLocation.tryBuild(PaperPlane.MOD_ID, "track_teleport_request"));
     public static final StreamCodec<RegistryFriendlyByteBuf, TrackTeleportRequestPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrackTeleportRequestPacket::requestId,

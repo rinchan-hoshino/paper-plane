@@ -34,5 +34,5 @@ public final class PaperPlaneRegistries {
         entity = Registry.register(BuiltInRegistries.ENTITY_TYPE, id("paper_plane"), EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC).sized(0.35F, 0.15F).clientTrackingRange(4).updateInterval(10).build(PaperPlane.MOD_ID + ":paper_plane"));
     }
 
-    private static ResourceLocation id(String path) { return ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, path); }
+    private static ResourceLocation id(String path) { return ResourceLocation.tryBuild(PaperPlane.MOD_ID, path); }
 }

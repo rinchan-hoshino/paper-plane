@@ -3,7 +3,9 @@ package dev.rinchan.paperplane.item;
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.PaperPlaneFlightModel;
 import dev.rinchan.paperplane.PlaneKind;
+import dev.rinchan.paperplane.client.PaperPlaneClientItemExtensions;
 import dev.rinchan.paperplane.entity.PaperPlaneEntity;
+import java.util.function.Consumer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 public class PaperPlaneItem extends Item {
     private static final int USE_DURATION = 72_000;
@@ -43,17 +46,19 @@ public class PaperPlaneItem extends Item {
         return UseAnim.TOOT_HORN;
     }
 
+    @Override
     public int getUseDuration(ItemStack stack) {
         return USE_DURATION;
     }
 
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return USE_DURATION;
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(PaperPlaneClientItemExtensions.INSTANCE);
     }
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
-        int chargeTicks = getUseDuration(stack, entity) - timeLeft;
+        int chargeTicks = getUseDuration(stack) - timeLeft;
         if (!PaperPlaneFlightModel.canLaunch(chargeTicks) || !(entity instanceof Player player)) {
             return;
         }
@@ -75,5 +80,4 @@ public class PaperPlaneItem extends Item {
             }
         }
     }
-
 }

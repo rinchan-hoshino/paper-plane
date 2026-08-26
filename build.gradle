@@ -1,11 +1,20 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id 'fabric-loom' version '1.11.8' apply false
     id 'net.neoforged.moddev' version '2.0.91' apply false
 }
 
+def versionProfiles = new JsonSlurper().parse(file('gradle/version-profiles.json')) as Map<String, Map<String, ?>>
+def selectedMinecraftVersion = findProperty("minecraft_version")?.toString() ?: '1.20.6'
+if (!versionProfiles.containsKey(selectedMinecraftVersion)) {
+    throw new GradleException("Unsupported minecraft_version '${selectedMinecraftVersion}'. Supported versions: ${versionProfiles.keySet().sort().join(', ')}")
+}
+ext.versionProfile = Collections.unmodifiableMap(new LinkedHashMap<>(versionProfiles[selectedMinecraftVersion]))
+
 subprojects {
     group = rootProject.mod_group_id
-    version = rootProject.mod_version
+    version = "${rootProject.mod_version}+${rootProject.versionProfile.minecraft_version}"
 
     repositories {
         mavenLocal()
@@ -23,15 +32,10 @@ subprojects {
             forRepository { maven { url = 'https://maven.architectury.dev/' } }
             filter { includeGroup 'dev.architectury' }
         }
-        maven { url = 'https://cursemaven.com' }
-        exclusiveContent {
-            forRepository { maven { url = 'https://api.modrinth.com/maven' } }
-            filter { includeGroup 'maven.modrinth' }
-        }
     }
 
     plugins.withType(JavaPlugin).configureEach {
-        java.toolchain.languageVersion = JavaLanguageVersion.of(rootProject.java_version as int)
+        java.toolchain.languageVersion = JavaLanguageVersion.of(rootProject.versionProfile.java_version as int)
         tasks.withType(JavaCompile).configureEach {
             options.encoding = 'UTF-8'
         }

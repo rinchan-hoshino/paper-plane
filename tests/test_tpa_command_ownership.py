@@ -76,7 +76,8 @@ class TpaCommandOwnershipTest(unittest.TestCase):
                 properties[key] = value
         self.assertEqual("1.0.0", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
-        self.assertEqual("8442866", properties["ftb_essentials_file_id"])
+        self.assertEqual("1.20.6", properties["minecraft_version"])
+        self.assertFalse(any(key.endswith("_file_id") for key in properties))
 
 
 if __name__ == "__main__":

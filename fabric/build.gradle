@@ -1,40 +1,76 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'fabric-loom'
 }
 
-def root = rootProject
-
-base { archivesName = "${root.mod_id}-fabric" }
-
-sourceSets.main.java {
-    srcDir root.file('common/src/main/java')
-    exclude 'dev/rinchan/paperplane/PaperPlaneNetworking.java'
-    exclude 'dev/rinchan/paperplane/client/PaperPlaneClient.java'
-    exclude 'dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java'
-    exclude 'dev/rinchan/paperplane/neoforge/**'
-    exclude 'dev/rinchan/paperplane/registry/PaperPlaneRegistries.java'
+base {
+    archivesName = "${rootProject.mod_id}-fabric"
 }
-sourceSets.main.resources.srcDir root.file('common/src/main/resources')
 
-loom { mixin { defaultRefmapName.set("${root.mod_id}.refmap.json") } }
+def profile = rootProject.versionProfile
+
+loom {
+    mixin {
+        defaultRefmapName = 'paper_plane.refmap.json'
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir rootProject.file('common/src/main/java')
+            exclude 'dev/rinchan/paperplane/PaperPlaneNetworking.java'
+            exclude 'dev/rinchan/paperplane/client/PaperPlaneClient.java'
+            exclude 'dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java'
+            exclude 'dev/rinchan/paperplane/neoforge/**'
+            exclude 'dev/rinchan/paperplane/registry/PaperPlaneRegistries.java'
+        }
+        resources.srcDir rootProject.file('common/src/main/resources')
+    }
+}
 
 dependencies {
-    minecraft "com.mojang:minecraft:${root.minecraft_version}"
+    minecraft "com.mojang:minecraft:${profile.minecraft_version}"
     mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${root.fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_api_version}"
-    modImplementation("dev.ftb.mods:ftb-library-fabric:${root.ftb_library_fabric_version}") { transitive = false }
-    modImplementation("dev.ftb.mods:ftb-essentials-fabric:${root.ftb_essentials_fabric_version}") { transitive = false }
-    implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1"))
+    modImplementation "net.fabricmc:fabric-loader:${profile.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${profile.fabric_api_version}"
+    implementation(include("io.github.llamalad7:mixinextras-fabric:${rootProject.mixin_extras_version}"))
+
+    modCompileOnly("dev.ftb.mods:ftb-library-fabric:${profile.ftb_library_version}") { transitive = false }
+    modCompileOnly("dev.ftb.mods:ftb-essentials-fabric:${profile.ftb_essentials_version}") { transitive = false }
+    modCompileOnly("dev.architectury:architectury-fabric:${profile.architectury_version}") { transitive = false }
 }
 
-def releaseVersion = root.mod_version
-def fabricArtifactId = "${root.mod_id}-fabric"
 processResources {
-    inputs.property 'version', releaseVersion
-    filesMatching('fabric.mod.json') { expand(version: releaseVersion) }
+    def expandProperties = [
+        version: project.version,
+        minecraft_version: profile.minecraft_version,
+        fabric_loader_version_range: profile.fabric_loader_version_range,
+        ftb_library_version_range: profile.ftb_library_version_range,
+        ftb_essentials_version_range: profile.ftb_essentials_version_range
+    ]
+    inputs.properties(expandProperties)
+    filesMatching('fabric.mod.json') {
+        expand(expandProperties)
+    }
+    if (profile.minecraft_version == '1.20.6') {
+        eachFile { details ->
+            details.path = details.path.replace("/recipe/", "/recipes/")
+        }
+    }
 }
 
-publishing { publications { mavenJava(MavenPublication) { artifactId = fabricArtifactId; from components.java } } }
+tasks.named('jar', Jar) {
+    from(rootProject.file('LICENSE')) {
+        rename { "LICENSE_${rootProject.mod_id}" }
+    }
+}
+
+tasks.named('remapJar') {
+    dependsOn tasks.named('jar')
+    inputFile = tasks.named('jar').flatMap { it.archiveFile }
+    archiveClassifier = ''
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('remapJar')
+}

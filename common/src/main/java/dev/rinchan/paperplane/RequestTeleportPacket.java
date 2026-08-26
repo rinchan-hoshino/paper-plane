@@ -8,7 +8,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record RequestTeleportPacket(UUID sessionId, UUID targetId) implements CustomPacketPayload {
-    public static final Type<RequestTeleportPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, "request_teleport"));
+    public static final Type<RequestTeleportPacket> TYPE = new Type<>(ResourceLocation.tryBuild(PaperPlane.MOD_ID, "request_teleport"));
     public static final StreamCodec<RegistryFriendlyByteBuf, RequestTeleportPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         RequestTeleportPacket::sessionId,
