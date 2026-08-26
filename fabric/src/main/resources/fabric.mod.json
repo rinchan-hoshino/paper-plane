@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "paper_plane",
+  "version": "${version}",
+  "name": "Paper Plane",
+  "description": "Paper planes for server-authoritative FTB teleport requests and deterministic gliding.",
+  "authors": ["RinChan"],
+  "license": "GPL-3.0-only",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.rinchan.paperplane.fabric.PaperPlaneFabric"],
+    "client": ["dev.rinchan.paperplane.fabric.PaperPlaneFabricClient"]
+  },
+  "mixins": ["paper_plane.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "1.21.1",
+    "fabric-api": "*",
+    "ftblibrary": ">=2101.1.31 <2102",
+    "ftbessentials": ">=2101.1.5 <2102",
+    "lychee": ">=6.4.4",
+    "kiwi": ">=15.7.5",
+    "architectury": ">=13"
+  }
+}

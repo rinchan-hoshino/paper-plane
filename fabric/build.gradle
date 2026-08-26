@@ -1,0 +1,43 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'fabric-loom'
+}
+
+def root = rootProject
+
+base { archivesName = "${root.mod_id}-fabric" }
+
+sourceSets.main.java {
+    srcDir root.file('common/src/main/java')
+    exclude 'dev/rinchan/paperplane/PaperPlaneNetworking.java'
+    exclude 'dev/rinchan/paperplane/client/PaperPlaneClient.java'
+    exclude 'dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java'
+    exclude 'dev/rinchan/paperplane/neoforge/**'
+    exclude 'dev/rinchan/paperplane/registry/PaperPlaneRegistries.java'
+}
+sourceSets.main.resources.srcDir root.file('common/src/main/resources')
+
+loom { mixin { defaultRefmapName.set("${root.mod_id}.refmap.json") } }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${root.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${root.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_api_version}"
+    modImplementation("dev.ftb.mods:ftb-library-fabric:${root.ftb_library_fabric_version}") { transitive = false }
+    modImplementation("dev.ftb.mods:ftb-essentials-fabric:${root.ftb_essentials_fabric_version}") { transitive = false }
+    modImplementation "maven.modrinth:lychee:${root.lychee_fabric_version}"
+    modImplementation "maven.modrinth:kiwi:${root.kiwi_fabric_version}"
+    modImplementation "maven.modrinth:architectury-api:${root.architectury_fabric_version}"
+    implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1"))
+}
+
+def releaseVersion = root.mod_version
+def fabricArtifactId = "${root.mod_id}-fabric"
+processResources {
+    inputs.property 'version', releaseVersion
+    filesMatching('fabric.mod.json') { expand(version: releaseVersion) }
+}
+
+publishing { publications { mavenJava(MavenPublication) { artifactId = fabricArtifactId; from components.java } } }
