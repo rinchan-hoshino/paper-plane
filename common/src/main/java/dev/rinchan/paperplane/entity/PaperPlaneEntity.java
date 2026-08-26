@@ -2,11 +2,12 @@ package dev.rinchan.paperplane.entity;
 
 import dev.rinchan.paperplane.PaperPlaneFlightModel;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -22,7 +23,7 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
     }
 
     public PaperPlaneEntity(Level level, LivingEntity owner, boolean enderPlane) {
-        super(PaperPlaneRegistries.PAPER_PLANE_ENTITY.get(), owner, level);
+        super(PaperPlaneRegistries.PAPER_PLANE_ENTITY.get(), owner, level, new ItemStack(PaperPlaneRegistries.PAPER_PLANE.get()));
         this.enderPlane = enderPlane;
     }
 
@@ -62,15 +63,15 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putBoolean("EnderPlane", enderPlane);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("EnderPlane", enderPlane);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        enderPlane = tag.getBoolean("EnderPlane");
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        enderPlane = input.getBooleanOr("EnderPlane", false);
     }
 
     private void orientToVelocity() {
@@ -90,7 +91,7 @@ public class PaperPlaneEntity extends ThrowableItemProjectile {
         resolved = true;
         if (!enderPlane) {
             ItemStack result = new ItemStack(wet ? PaperPlaneRegistries.SOGGY_PAPER_PLANE.get() : PaperPlaneRegistries.PAPER_PLANE.get());
-            spawnAtLocation(result);
+            spawnAtLocation((net.minecraft.server.level.ServerLevel) level(), result);
         }
         discard();
     }

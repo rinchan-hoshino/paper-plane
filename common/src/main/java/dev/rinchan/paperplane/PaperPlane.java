@@ -32,8 +32,8 @@ public final class PaperPlane {
         reconcilePending(player);
         Optional<TeleportRequestLedger.Pending> pending = REQUESTS.pendingFor(player.getUUID());
         if (pending.isPresent()) {
-            ServerPlayer target = player.server.getPlayerList().getPlayer(pending.get().targetId());
-            String name = target == null ? pending.get().targetId().toString() : target.getGameProfile().getName();
+            ServerPlayer target = player.level().getServer().getPlayerList().getPlayer(pending.get().targetId());
+            String name = target == null ? pending.get().targetId().toString() : target.getGameProfile().name();
             player.sendSystemMessage(Component.translatable("message.paper_plane.pending", name).withStyle(ChatFormatting.YELLOW));
             return;
         }
@@ -43,17 +43,17 @@ public final class PaperPlane {
         }
 
         UUID sessionId = UUID.randomUUID();
-        long expiresAt = player.serverLevel().getGameTime() + SELECTION_SESSION_TICKS;
+        long expiresAt = player.level().getGameTime() + SELECTION_SESSION_TICKS;
         SELECTIONS.put(player.getUUID(), new SelectionSession(sessionId, planeKind, expiresAt));
         PaperPlaneNetworking.sendToPlayer(
             player,
-            PaperPlaneNetworking.playerListPacket(player.server, player.getUUID(), sessionId, planeKind)
+            PaperPlaneNetworking.playerListPacket(player.level().getServer(), player.getUUID(), sessionId, planeKind)
         );
     }
 
     public static void requestTeleport(ServerPlayer requester, UUID sessionId, UUID targetId) {
         SelectionSession session = SELECTIONS.remove(requester.getUUID());
-        if (session == null || !session.sessionId().equals(sessionId) || requester.serverLevel().getGameTime() > session.expiresAt()) {
+        if (session == null || !session.sessionId().equals(sessionId) || requester.level().getGameTime() > session.expiresAt()) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.selection_expired").withStyle(ChatFormatting.RED));
             return;
         }
@@ -64,7 +64,7 @@ public final class PaperPlane {
             return;
         }
 
-        ServerPlayer target = requester.server.getPlayerList().getPlayer(targetId);
+        ServerPlayer target = requester.level().getServer().getPlayerList().getPlayer(targetId);
         if (target == null) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.target_offline").withStyle(ChatFormatting.RED));
             return;
@@ -121,7 +121,7 @@ public final class PaperPlane {
             return 0;
         }
 
-        ServerPlayer requester = target.server.getPlayerList().getPlayer(pending.requesterId());
+        ServerPlayer requester = target.level().getServer().getPlayerList().getPlayer(pending.requesterId());
         if (requester == null) {
             return operation.getAsInt();
         }
@@ -139,11 +139,11 @@ public final class PaperPlane {
         try {
             int result = operation.getAsInt();
             if (result > 0) {
-                clearRequest(target.server, id);
+                clearRequest(target.level().getServer(), id);
             } else {
                 refund(requester, payment);
                 if (!TPACommand.requests().containsKey(id)) {
-                    clearRequest(target.server, id);
+                    clearRequest(target.level().getServer(), id);
                 }
             }
             return result;
@@ -157,7 +157,7 @@ public final class PaperPlane {
         if (result > 0) {
             REQUESTS.byRequest(requestId)
                 .filter(pending -> pending.targetId().equals(target.getUUID()))
-                .ifPresent(pending -> clearRequest(target.server, requestId));
+                .ifPresent(pending -> clearRequest(target.level().getServer(), requestId));
         }
     }
 
@@ -165,14 +165,14 @@ public final class PaperPlane {
         SELECTIONS.remove(player.getUUID());
         for (TeleportRequestLedger.Pending pending : REQUESTS.removePlayer(player.getUUID())) {
             TPACommand.requests().remove(pending.requestId());
-            notifyTracking(player.server, pending, false);
+            notifyTracking(player.level().getServer(), pending, false);
         }
     }
 
     private static void reconcilePending(ServerPlayer player) {
         REQUESTS.pendingFor(player.getUUID())
             .filter(pending -> !TPACommand.requests().containsKey(pending.requestId()))
-            .ifPresent(pending -> clearRequest(player.server, pending.requestId()));
+            .ifPresent(pending -> clearRequest(player.level().getServer(), pending.requestId()));
     }
 
     private static void clearRequest(net.minecraft.server.MinecraftServer server, UUID requestId) {

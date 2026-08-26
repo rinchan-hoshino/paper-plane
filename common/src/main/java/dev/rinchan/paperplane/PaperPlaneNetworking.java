@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public final class PaperPlaneNetworking {
     private PaperPlaneNetworking() {
@@ -14,7 +15,7 @@ public final class PaperPlaneNetworking {
     public static OpenTeleportScreenPacket playerListPacket(MinecraftServer server, UUID requester, UUID sessionId, PlaneKind planeKind) {
         List<PlayerEntry> players = server.getPlayerList().getPlayers().stream()
             .filter(player -> !player.getUUID().equals(requester))
-            .map(player -> new PlayerEntry(player.getUUID(), player.getGameProfile().getName()))
+            .map(player -> new PlayerEntry(player.getUUID(), player.getGameProfile().name()))
             .toList();
         return new OpenTeleportScreenPacket(sessionId, players, planeKind == PlaneKind.ENDER);
     }
@@ -24,10 +25,10 @@ public final class PaperPlaneNetworking {
     }
 
     public static void sendTeleportRequest(UUID sessionId, UUID targetId) {
-        PacketDistributor.sendToServer(new RequestTeleportPacket(sessionId, targetId));
+        ClientPacketDistributor.sendToServer(new RequestTeleportPacket(sessionId, targetId));
     }
 
     public static void sendTeleportResponse(UUID requestId, boolean accept) {
-        PacketDistributor.sendToServer(new RespondTeleportPacket(requestId, accept));
+        ClientPacketDistributor.sendToServer(new RespondTeleportPacket(requestId, accept));
     }
 }

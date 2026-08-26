@@ -8,12 +8,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
 public class PaperPlaneItem extends Item {
@@ -26,21 +26,20 @@ public class PaperPlaneItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (player.isShiftKeyDown() && planeKind.throwable()) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume(stack);
+            return InteractionResult.CONSUME;
         }
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
             PaperPlane.openTeleportScreen(serverPlayer, planeKind);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.TOOT_HORN;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.TOOT_HORN;
     }
 
     @Override
@@ -49,10 +48,10 @@ public class PaperPlaneItem extends Item {
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
+    public boolean releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
         int chargeTicks = getUseDuration(stack, entity) - timeLeft;
         if (!PaperPlaneFlightModel.canLaunch(chargeTicks) || !(entity instanceof Player player)) {
-            return;
+            return false;
         }
         if (!level.isClientSide()) {
             PaperPlaneEntity plane = new PaperPlaneEntity(level, player, planeKind == PlaneKind.ENDER);
@@ -71,6 +70,7 @@ public class PaperPlaneItem extends Item {
                 stack.shrink(1);
             }
         }
+        return true;
     }
 
 }

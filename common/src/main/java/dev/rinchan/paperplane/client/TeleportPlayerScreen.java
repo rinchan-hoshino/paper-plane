@@ -1,14 +1,14 @@
 package dev.rinchan.paperplane.client;
 
 import dev.ftb.mods.ftblibrary.icon.Icon;
-import dev.ftb.mods.ftblibrary.ui.BaseScreen;
-import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
-import dev.ftb.mods.ftblibrary.ui.Theme;
+import dev.ftb.mods.ftblibrary.client.gui.theme.Theme;
+import dev.ftb.mods.ftblibrary.client.gui.widget.BaseScreen;
+import dev.ftb.mods.ftblibrary.client.gui.widget.SimpleTextButton;
 import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.PlayerEntry;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public class TeleportPlayerScreen extends BaseScreen {
@@ -50,7 +50,7 @@ public class TeleportPlayerScreen extends BaseScreen {
     }
 
     @Override
-    public void drawBackground(GuiGraphics graphics, Theme theme, int x, int y, int w, int h) {
+    public void drawBackground(GuiGraphicsExtractor graphics, Theme theme, int x, int y, int w, int h) {
         super.drawBackground(graphics, theme, x, y, w, h);
         theme.drawGui(graphics, x, y, w, h, getWidgetType());
         theme.drawString(graphics, Component.translatable(enderPlane ? "screen.paper_plane.title_ender" : "screen.paper_plane.title"), x + 12, y + 12);

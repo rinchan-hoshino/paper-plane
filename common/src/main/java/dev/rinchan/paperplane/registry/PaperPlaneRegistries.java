@@ -7,6 +7,9 @@ import dev.rinchan.paperplane.item.PaperPlaneItem;
 import dev.rinchan.paperplane.item.SoggyPaperPlaneItem;
 import java.util.function.Supplier;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
@@ -37,7 +40,7 @@ public final class PaperPlaneRegistries {
             .sized(0.35F, 0.15F)
             .clientTrackingRange(4)
             .updateInterval(10)
-            .build(PaperPlane.MOD_ID + ":paper_plane")
+            .build(ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(PaperPlane.MOD_ID, "paper_plane")))
     );
 
     private PaperPlaneRegistries() {

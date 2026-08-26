@@ -10,10 +10,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 public final class PaperPlaneFabric implements ModInitializer {
     @Override public void onInitialize() {
         PaperPlaneRegistries.register();
-        PayloadTypeRegistry.playC2S().register(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC);
-        PayloadTypeRegistry.playC2S().register(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(RequestTeleportPacket.TYPE, (packet, context) -> context.server().execute(() -> {
             try { PaperPlane.requestTeleport(context.player(), packet.sessionId(), packet.targetId()); }
             catch (Throwable failure) { PaperPlane.LOGGER.error("Failed to request teleport", failure); }

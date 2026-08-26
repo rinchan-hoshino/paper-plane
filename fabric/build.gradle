@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
 }
 
 def root = rootProject
@@ -18,15 +18,12 @@ sourceSets.main.java {
 }
 sourceSets.main.resources.srcDir root.file('common/src/main/resources')
 
-loom { mixin { defaultRefmapName.set("${root.mod_id}.refmap.json") } }
-
 dependencies {
     minecraft "com.mojang:minecraft:${root.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${root.fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_api_version}"
-    modImplementation("dev.ftb.mods:ftb-library-fabric:${root.ftb_library_fabric_version}") { transitive = false }
-    modImplementation("dev.ftb.mods:ftb-essentials-fabric:${root.ftb_essentials_fabric_version}") { transitive = false }
+    implementation "net.fabricmc:fabric-loader:${root.fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_api_version}"
+    implementation("dev.ftb.mods:ftb-library-fabric:${root.ftb_library_fabric_version}") { transitive = false }
+    implementation("dev.ftb.mods:ftb-essentials-fabric:${root.ftb_essentials_fabric_version}") { transitive = false }
     implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1"))
 }
 

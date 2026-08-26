@@ -8,7 +8,9 @@ import dev.rinchan.paperplane.item.SoggyPaperPlaneItem;
 import java.util.function.Supplier;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
@@ -31,8 +33,8 @@ public final class PaperPlaneRegistries {
         normal = Registry.register(BuiltInRegistries.ITEM, id("paper_plane"), new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.NORMAL));
         soggy = Registry.register(BuiltInRegistries.ITEM, id("soggy_paper_plane"), new SoggyPaperPlaneItem(new Item.Properties().stacksTo(16)));
         ender = Registry.register(BuiltInRegistries.ITEM, id("ender_paper_plane"), new PaperPlaneItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), PlaneKind.ENDER));
-        entity = Registry.register(BuiltInRegistries.ENTITY_TYPE, id("paper_plane"), EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC).sized(0.35F, 0.15F).clientTrackingRange(4).updateInterval(10).build(PaperPlane.MOD_ID + ":paper_plane"));
+        entity = Registry.register(BuiltInRegistries.ENTITY_TYPE, id("paper_plane"), EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC).sized(0.35F, 0.15F).clientTrackingRange(4).updateInterval(10).build(ResourceKey.create(Registries.ENTITY_TYPE, id("paper_plane"))));
     }
 
-    private static ResourceLocation id(String path) { return ResourceLocation.fromNamespaceAndPath(PaperPlane.MOD_ID, path); }
+    private static Identifier id(String path) { return Identifier.fromNamespaceAndPath(PaperPlane.MOD_ID, path); }
 }

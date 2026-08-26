@@ -55,13 +55,14 @@ neoForge.ideSyncTask tasks.named('generateModMetadata')
 sourceSets.test.java.srcDir rootProject.file('common/src/test/java')
 
 dependencies {
-    compileOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
-    compileOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
-    runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
-    runtimeOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
+    compileOnly "dev.ftb.mods:ftb-library-neoforge:${rootProject.ftb_library_version}"
+    compileOnly "dev.ftb.mods:ftb-essentials-neoforge:${rootProject.ftb_essentials_version}"
+    runtimeOnly "dev.ftb.mods:ftb-library-neoforge:${rootProject.ftb_library_version}"
+    runtimeOnly "dev.ftb.mods:ftb-essentials-neoforge:${rootProject.ftb_essentials_version}"
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test', Test).configure {
