@@ -8,5 +8,10 @@
   "screen.paper_plane.no_players": "No other players are online",
   "message.paper_plane.target_offline": "That player is offline.",
   "message.paper_plane.no_self": "You cannot send a teleport request to yourself.",
-  "message.paper_plane.no_plane": "You need 1 Paper Plane or Paper Plane That Can't Fly?"
+  "message.paper_plane.no_plane": "You need 1 Paper Plane or Paper Plane That Can't Fly?",
+  "message.paper_plane.pending": "You already have a pending paper-plane request to %s.",
+  "message.paper_plane.pending_unknown": "You already have a pending paper-plane request.",
+  "message.paper_plane.selection_expired": "That paper-plane selection expired. Use the plane again.",
+  "message.paper_plane.no_selected_plane": "You no longer have the paper plane used for this request.",
+  "message.paper_plane.requester_no_plane": "The requester no longer has the required paper plane."
 }

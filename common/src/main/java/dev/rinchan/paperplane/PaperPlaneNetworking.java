@@ -1,30 +1,23 @@
 package dev.rinchan.paperplane;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class PaperPlaneNetworking {
     private PaperPlaneNetworking() {
     }
 
-    public static OpenTeleportScreenPacket playerListPacket(MinecraftServer server, java.util.UUID requesterId, boolean enderPlane) {
-        List<PlayerEntry> entries = new ArrayList<>();
-        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if (!player.getUUID().equals(requesterId)) {
-                entries.add(new PlayerEntry(player.getUUID(), player.getGameProfile().getName()));
-            }
-        }
-        return new OpenTeleportScreenPacket(entries, enderPlane);
+    public static OpenTeleportScreenPacket playerListPacket(MinecraftServer server, UUID requester, UUID sessionId, PlaneKind planeKind) {
+        List<PlayerEntry> players = server.getPlayerList().getPlayers().stream()
+            .filter(player -> !player.getUUID().equals(requester))
+            .map(player -> new PlayerEntry(player.getUUID(), player.getGameProfile().getName()))
+            .toList();
+        return new OpenTeleportScreenPacket(sessionId, players, planeKind == PlaneKind.ENDER);
     }
 
-    public static void sendTeleportRequest(UUIDLikeTarget target, boolean enderPlane) {
-        PacketDistributor.sendToServer(new RequestTeleportPacket(target.id(), enderPlane));
-    }
-
-    public interface UUIDLikeTarget {
-        java.util.UUID id();
+    public static void sendTeleportRequest(UUID sessionId, UUID targetId) {
+        PacketDistributor.sendToServer(new RequestTeleportPacket(sessionId, targetId));
     }
 }

@@ -4,6 +4,7 @@ import dev.rinchan.paperplane.OpenTeleportScreenPacket;
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.RequestTeleportPacket;
 import dev.rinchan.paperplane.RespondTeleportPacket;
+import dev.rinchan.paperplane.TrackTeleportRequestPacket;
 import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,6 +17,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(PaperPlane.MOD_ID)
@@ -31,23 +33,30 @@ public class PaperPlaneNeoForge {
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1").optional();
-        registrar.playToClient(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC, (packet, context) -> {
-            context.enqueueWork(() -> PaperPlaneClient.openTeleportScreen(packet)).exceptionally(throwable -> null);
-        });
-        registrar.playToServer(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC, (packet, context) -> {
-            context.enqueueWork(() -> {
+        PayloadRegistrar registrar = event.registrar("2");
+        registrar.playToClient(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC,
+            (packet, context) -> enqueue(context, () -> PaperPlaneClient.openTeleportScreen(packet), "open teleport screen"));
+        registrar.playToClient(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC,
+            (packet, context) -> enqueue(context, () -> PaperPlaneClient.trackTeleportRequest(packet), "track teleport request"));
+        registrar.playToServer(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC,
+            (packet, context) -> enqueue(context, () -> {
                 if (context.player() instanceof ServerPlayer player) {
-                    PaperPlane.requestTeleport(player, packet.targetId(), packet.enderPlane());
+                    PaperPlane.requestTeleport(player, packet.sessionId(), packet.targetId());
                 }
-            }).exceptionally(throwable -> null);
-        });
-        registrar.playToServer(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC, (packet, context) -> {
-            context.enqueueWork(() -> {
+            }, "request teleport"));
+        registrar.playToServer(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC,
+            (packet, context) -> enqueue(context, () -> {
                 if (context.player() instanceof ServerPlayer player) {
                     PaperPlane.respondToTeleportRequest(player, packet.requestId(), packet.accept());
                 }
-            }).exceptionally(throwable -> null);
+            }, "respond to teleport request"));
+    }
+
+    private static void enqueue(IPayloadContext context, Runnable work, String action) {
+        context.enqueueWork(work).whenComplete((unused, failure) -> {
+            if (failure != null) {
+                PaperPlane.LOGGER.error("Failed to {}", action, failure);
+            }
         });
     }
 

@@ -8,5 +8,10 @@
   "screen.paper_plane.no_players": "当前没有其他在线玩家",
   "message.paper_plane.target_offline": "目标玩家已经离线。",
   "message.paper_plane.no_self": "不能向自己发送传送请求。",
-  "message.paper_plane.no_plane": "你需要携带 1 个纸飞机或飞不起来的纸飞机。"
+  "message.paper_plane.no_plane": "你需要携带 1 个纸飞机或飞不起来的纸飞机。",
+  "message.paper_plane.pending": "你已经向 %s 发出了纸飞机传送请求。",
+  "message.paper_plane.pending_unknown": "你已经有一个待处理的纸飞机传送请求。",
+  "message.paper_plane.selection_expired": "这次纸飞机选择已过期，请重新使用纸飞机。",
+  "message.paper_plane.no_selected_plane": "你已经不再持有这次请求所用的纸飞机。",
+  "message.paper_plane.requester_no_plane": "请求者已经不再持有需要的纸飞机。"
 }

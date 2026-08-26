@@ -2,20 +2,22 @@ package dev.rinchan.paperplane.client;
 
 import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
-import dev.ftb.mods.ftblibrary.ui.Panel;
 import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
 import dev.ftb.mods.ftblibrary.ui.Theme;
 import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.PlayerEntry;
 import java.util.List;
+import java.util.UUID;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public class TeleportPlayerScreen extends BaseScreen {
+    private final UUID sessionId;
     private final List<PlayerEntry> players;
     private final boolean enderPlane;
 
-    public TeleportPlayerScreen(List<PlayerEntry> players, boolean enderPlane) {
+    public TeleportPlayerScreen(UUID sessionId, List<PlayerEntry> players, boolean enderPlane) {
+        this.sessionId = sessionId;
         this.players = players;
         this.enderPlane = enderPlane;
         setSize(240, Math.min(210, 42 + Math.max(1, players.size()) * 24));
@@ -33,7 +35,7 @@ public class TeleportPlayerScreen extends BaseScreen {
         int y = 32;
         for (PlayerEntry player : players) {
             SimpleTextButton button = SimpleTextButton.create(this, Component.literal(player.name()), Icon.empty(), mouseButton -> {
-                PaperPlaneNetworking.sendTeleportRequest(player::id, enderPlane);
+                PaperPlaneNetworking.sendTeleportRequest(sessionId, player.id());
                 closeGui(false);
             });
             button.setPosAndSize(12, y, width - 24, 20);

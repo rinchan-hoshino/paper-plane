@@ -1,6 +1,7 @@
 package dev.rinchan.paperplane.registry;
 
 import dev.rinchan.paperplane.PaperPlane;
+import dev.rinchan.paperplane.PlaneKind;
 import dev.rinchan.paperplane.entity.PaperPlaneEntity;
 import dev.rinchan.paperplane.item.PaperPlaneItem;
 import dev.rinchan.paperplane.item.SoggyPaperPlaneItem;
@@ -19,7 +20,7 @@ public final class PaperPlaneRegistries {
 
     public static final Supplier<Item> PAPER_PLANE = ITEMS.register(
         "paper_plane",
-        () -> new PaperPlaneItem(false, new Item.Properties().stacksTo(16))
+        () -> new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.NORMAL)
     );
     public static final Supplier<Item> SOGGY_PAPER_PLANE = ITEMS.register(
         "soggy_paper_plane",
@@ -27,7 +28,7 @@ public final class PaperPlaneRegistries {
     );
     public static final Supplier<Item> ENDER_PAPER_PLANE = ITEMS.register(
         "ender_paper_plane",
-        () -> new PaperPlaneItem(true, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON))
+        () -> new PaperPlaneItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), PlaneKind.ENDER)
     );
 
     public static final Supplier<EntityType<PaperPlaneEntity>> PAPER_PLANE_ENTITY = ENTITY_TYPES.register(
