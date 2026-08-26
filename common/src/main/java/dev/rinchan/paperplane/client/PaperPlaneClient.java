@@ -1,7 +1,7 @@
 package dev.rinchan.paperplane.client;
 
 import dev.rinchan.paperplane.OpenTeleportScreenPacket;
-import dev.rinchan.paperplane.RespondTeleportPacket;
+import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.TrackTeleportRequestPacket;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import java.util.HashSet;
@@ -10,7 +10,6 @@ import java.util.UUID;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class PaperPlaneClient {
     private static final Set<UUID> TRACKED_REQUESTS = new HashSet<>();
@@ -53,7 +52,7 @@ public final class PaperPlaneClient {
             if (!TRACKED_REQUESTS.contains(id)) {
                 return false;
             }
-            PacketDistributor.sendToServer(new RespondTeleportPacket(id, accept));
+            PaperPlaneNetworking.sendTeleportResponse(id, accept);
             return true;
         } catch (IllegalArgumentException ignored) {
             return false;

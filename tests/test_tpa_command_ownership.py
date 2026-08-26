@@ -34,8 +34,11 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn('"tpaccept "', client)
         self.assertIn('"tpdeny "', client)
-        self.assertIn("PacketDistributor.sendToServer", client)
-        self.assertIn("new RespondTeleportPacket", client)
+        self.assertIn("PaperPlaneNetworking.sendTeleportResponse", client)
+        networking = (
+            COMMON / "java/dev/rinchan/paperplane/PaperPlaneNetworking.java"
+        ).read_text(encoding="utf-8")
+        self.assertIn("new RespondTeleportPacket", networking)
         self.assertIn("TRACKED_REQUESTS.contains(id)", client)
 
         mixin = (
@@ -71,7 +74,7 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 properties[key] = value
-        self.assertEqual("0.1.8", properties["mod_version"])
+        self.assertEqual("1.0.0", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
         self.assertEqual("8442866", properties["ftb_essentials_file_id"])
 

@@ -47,4 +47,4 @@ There is no Paper Plane config file, command, capability, attachment, player Sav
 
 ## Support
 
-Paper Plane 1.0.0 targets Minecraft 1.21.1 NeoForge. Minecraft 26.1.2 has the required dependencies but needs a substantive entity, renderer, item-use and FTB GUI port; Minecraft 26.2 has no FTB Library or FTB Essentials release.
+Paper Plane 1.0.0 follows its required dependency stack across Minecraft 1.20.1 Fabric/Forge, 1.21.1 Fabric/NeoForge, and 26.1.2 Fabric/NeoForge. Minecraft 1.21.11 is excluded because Lychee/Kiwi are unavailable; Minecraft 26.2 is excluded because FTB Library/Essentials are unavailable.

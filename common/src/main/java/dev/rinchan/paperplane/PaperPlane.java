@@ -14,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ public final class PaperPlane {
         UUID sessionId = UUID.randomUUID();
         long expiresAt = player.serverLevel().getGameTime() + SELECTION_SESSION_TICKS;
         SELECTIONS.put(player.getUUID(), new SelectionSession(sessionId, planeKind, expiresAt));
-        PacketDistributor.sendToPlayer(
+        PaperPlaneNetworking.sendToPlayer(
             player,
             PaperPlaneNetworking.playerListPacket(player.server, player.getUUID(), sessionId, planeKind)
         );
@@ -99,7 +98,7 @@ public final class PaperPlane {
             LOGGER.error("Rejected duplicate Paper Plane pending state for requester {}", requester.getUUID());
             return;
         }
-        PacketDistributor.sendToPlayer(target, new TrackTeleportRequestPacket(request.id(), true));
+        PaperPlaneNetworking.sendToPlayer(target, new TrackTeleportRequestPacket(request.id(), true));
     }
 
     public static int respondToTeleportRequest(ServerPlayer target, UUID requestId, boolean accept) {
@@ -183,7 +182,7 @@ public final class PaperPlane {
     private static void notifyTracking(net.minecraft.server.MinecraftServer server, TeleportRequestLedger.Pending pending, boolean active) {
         ServerPlayer target = server.getPlayerList().getPlayer(pending.targetId());
         if (target != null) {
-            PacketDistributor.sendToPlayer(target, new TrackTeleportRequestPacket(pending.requestId(), active));
+            PaperPlaneNetworking.sendToPlayer(target, new TrackTeleportRequestPacket(pending.requestId(), active));
         }
     }
 

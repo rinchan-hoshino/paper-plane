@@ -3,7 +3,7 @@
 ## 1.0.0
 
 - Promotes the server-authoritative request, atomic payment, two-second charging pose, deterministic glide physics and corrected hand transforms to the stable public contract.
-- Publishes the Minecraft 1.21.1 NeoForge artifact; later Minecraft generations require a substantive platform port and are not claimed compatible.
+- Publishes every Fabric/Forge-family target where the complete required dependency stack exists: Minecraft 1.20.1 Fabric/Forge, 1.21.1 Fabric/NeoForge, and 26.1.2 Fabric/NeoForge.
 
 ## 0.1.9
 
