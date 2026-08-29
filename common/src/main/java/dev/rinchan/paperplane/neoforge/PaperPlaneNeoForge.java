@@ -1,10 +1,11 @@
 package dev.rinchan.paperplane.neoforge;
 
+import dev.rinchan.paperplane.FallbackTeleportResponsePacket;
 import dev.rinchan.paperplane.OpenTeleportScreenPacket;
 import dev.rinchan.paperplane.PaperPlane;
+import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.RequestTeleportPacket;
 import dev.rinchan.paperplane.RespondTeleportPacket;
-import dev.rinchan.paperplane.TrackTeleportRequestPacket;
 import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,11 +34,11 @@ public class PaperPlaneNeoForge {
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("2");
+        PayloadRegistrar registrar = event.registrar("3");
         registrar.playToClient(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC,
             (packet, context) -> enqueue(context, () -> PaperPlaneClient.openTeleportScreen(packet), "open teleport screen"));
-        registrar.playToClient(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC,
-            (packet, context) -> enqueue(context, () -> PaperPlaneClient.trackTeleportRequest(packet), "track teleport request"));
+        registrar.playToClient(FallbackTeleportResponsePacket.TYPE, FallbackTeleportResponsePacket.CODEC,
+            (packet, context) -> enqueue(context, () -> PaperPlaneClient.fallbackTeleportResponse(packet), "fallback teleport response"));
         registrar.playToServer(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC,
             (packet, context) -> enqueue(context, () -> {
                 if (context.player() instanceof ServerPlayer player) {
@@ -46,8 +47,9 @@ public class PaperPlaneNeoForge {
             }, "request teleport"));
         registrar.playToServer(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC,
             (packet, context) -> enqueue(context, () -> {
-                if (context.player() instanceof ServerPlayer player) {
-                    PaperPlane.respondToTeleportRequest(player, packet.requestId(), packet.accept());
+                if (context.player() instanceof ServerPlayer player
+                    && !PaperPlane.respondToTeleportRequest(player, packet.requestId(), packet.accept())) {
+                    PaperPlaneNetworking.sendToPlayer(player, new FallbackTeleportResponsePacket(packet.requestId(), packet.accept()));
                 }
             }, "respond to teleport request"));
     }

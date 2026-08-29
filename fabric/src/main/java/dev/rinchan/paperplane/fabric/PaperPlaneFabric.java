@@ -13,14 +13,19 @@ public final class PaperPlaneFabric implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(FallbackTeleportResponsePacket.TYPE, FallbackTeleportResponsePacket.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(RequestTeleportPacket.TYPE, (packet, context) -> context.server().execute(() -> {
             try { PaperPlane.requestTeleport(context.player(), packet.sessionId(), packet.targetId()); }
             catch (Throwable failure) { PaperPlane.LOGGER.error("Failed to request teleport", failure); }
         }));
         ServerPlayNetworking.registerGlobalReceiver(RespondTeleportPacket.TYPE, (packet, context) -> context.server().execute(() -> {
-            try { PaperPlane.respondToTeleportRequest(context.player(), packet.requestId(), packet.accept()); }
-            catch (Throwable failure) { PaperPlane.LOGGER.error("Failed to respond to teleport request", failure); }
+            try {
+                if (!PaperPlane.respondToTeleportRequest(context.player(), packet.requestId(), packet.accept())) {
+                    PaperPlaneNetworking.sendToPlayer(context.player(), new FallbackTeleportResponsePacket(packet.requestId(), packet.accept()));
+                }
+            } catch (Throwable failure) {
+                PaperPlane.LOGGER.error("Failed to respond to teleport request", failure);
+            }
         }));
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> PaperPlane.clearPlayer(handler.player));
     }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- Routes every syntactically valid FTB accept/deny button through the server-owned Paper Plane ledger, eliminating the client-tracking race that could leak a click into disabled FTB commands.
+- Returns non-Paper Plane request buttons to their original FTB command explicitly, preserving compatibility without trusting client request ownership.
+
 ## 1.0.0
 
 - Promotes the server-authoritative request, atomic payment, two-second charging pose, deterministic glide physics and corrected hand transforms to the stable public contract.

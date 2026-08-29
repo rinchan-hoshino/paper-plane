@@ -31,6 +31,11 @@ public final class TeleportRequestLedger {
         return Optional.ofNullable(byRequest.get(requestId));
     }
 
+    public boolean isOwnedByTarget(UUID requestId, UUID targetId) {
+        Pending pending = byRequest.get(requestId);
+        return pending != null && pending.targetId().equals(targetId);
+    }
+
     public boolean hasPending(UUID requesterId) {
         return requestByRequester.containsKey(requesterId);
     }

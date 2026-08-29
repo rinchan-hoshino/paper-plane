@@ -30,4 +30,18 @@ final class TeleportRequestLedgerTest {
         assertTrue(ledger.removePlayer(target).size() == 1);
         assertFalse(ledger.hasPending(requester));
     }
+
+    @Test
+    void onlyTheRecordedTargetOwnsAResponse() {
+        TeleportRequestLedger ledger = new TeleportRequestLedger();
+        UUID requester = UUID.randomUUID();
+        UUID target = UUID.randomUUID();
+        UUID request = UUID.randomUUID();
+        assertTrue(ledger.add(new TeleportRequestLedger.Pending(request, requester, target, PlaneKind.NORMAL)));
+        assertTrue(ledger.isOwnedByTarget(request, target));
+        assertFalse(ledger.isOwnedByTarget(request, requester));
+        assertFalse(ledger.isOwnedByTarget(UUID.randomUUID(), target));
+        ledger.remove(request);
+        assertFalse(ledger.isOwnedByTarget(request, target));
+    }
 }

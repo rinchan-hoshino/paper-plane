@@ -16,7 +16,7 @@ The server creates a one-use selection session bound to the actual plane used. T
 
 Normal and soggy planes are removed immediately before FTB performs an accepted teleport. A failed teleport refunds the exact plane, and a missing plane prevents teleportation. Creative players keep their item. Ender planes remain reusable.
 
-FTB chat accept/deny buttons are converted to packets only for request UUIDs explicitly tracked by Paper Plane. FTB TPA commands may therefore remain disabled without intercepting unrelated commands from other mods.
+FTB chat accept/deny buttons always ask the server to resolve the request UUID. The server acts only when its Paper Plane ledger owns that request; otherwise it explicitly returns the click to the original FTB command. FTB TPA commands may therefore remain disabled without making transient client tracking state an authority or intercepting unrelated requests from other mods.
 
 ## Charged flight
 
@@ -45,4 +45,4 @@ There is no Paper Plane config file, command, capability, attachment, player Sav
 
 ## Support
 
-Paper Plane 1.0.0 follows every stable FTB Library / FTB Essentials target: Minecraft 1.19.2 Fabric/Forge; 1.20.1 Fabric/Forge; 1.20.4 Fabric/Forge/NeoForge; and 1.20.6, 1.21, 1.21.1, 1.21.11 and 26.1.2 on Fabric/NeoForge. Snapshot-only dependency generations are not formal targets.
+Paper Plane 1.0.1 follows every stable FTB Library / FTB Essentials target: Minecraft 1.19.2 Fabric/Forge; 1.20.1 Fabric/Forge; 1.20.4 Fabric/Forge/NeoForge; and 1.20.6, 1.21, 1.21.1, 1.21.11 and 26.1.2 on Fabric/NeoForge. Snapshot-only dependency generations are not formal targets.
