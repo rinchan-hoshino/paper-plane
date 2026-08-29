@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- Updates the 26.1.2 chat-command interception mixin to the current `sendCommand` contract so FTB accept/deny buttons can be routed without a missing injection target.
+- Upgrades the release wrapper to Gradle 9.5.1 for the 26.1.2 Loom/ModDev toolchain.
+
 ## 1.0.0
 
 - Promotes the server-authoritative request, atomic payment, two-second charging pose, deterministic glide physics and corrected hand transforms to the stable public contract.

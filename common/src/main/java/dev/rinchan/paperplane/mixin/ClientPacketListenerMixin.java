@@ -5,14 +5,14 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin {
-    @Inject(method = "sendUnsignedCommand", at = @At("HEAD"), cancellable = true)
-    private void paperPlane$handleTeleportResponse(String command, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "sendCommand", at = @At("HEAD"), cancellable = true)
+    private void paperPlane$handleTeleportResponse(String command, CallbackInfo callback) {
         if (PaperPlaneClient.handleTeleportResponseCommand(command)) {
-            callback.setReturnValue(true);
+            callback.cancel();
         }
     }
 }

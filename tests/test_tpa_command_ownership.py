@@ -44,7 +44,9 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         mixin = (
             COMMON / "java/dev/rinchan/paperplane/mixin/ClientPacketListenerMixin.java"
         ).read_text(encoding="utf-8")
-        self.assertIn('method = "sendUnsignedCommand"', mixin)
+        self.assertIn('method = "sendCommand"', mixin)
+        self.assertIn("CallbackInfo callback", mixin)
+        self.assertIn("callback.cancel()", mixin)
         self.assertIn("PaperPlaneClient.handleTeleportResponseCommand", mixin)
         self.assertIn("cancellable = true", mixin)
 
@@ -74,9 +76,10 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 properties[key] = value
-        self.assertEqual("1.0.0", properties["mod_version"])
+        self.assertEqual("1.0.1", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
-        self.assertEqual("8442866", properties["ftb_essentials_file_id"])
+        self.assertEqual("26.1.2.7", properties["ftb_library_version"])
+        self.assertEqual("26.1.2.4", properties["ftb_essentials_version"])
 
 
 if __name__ == "__main__":
