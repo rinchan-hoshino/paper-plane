@@ -17,6 +17,7 @@ sourceSets.main.resources.srcDir tasks.register('generateModMetadata', ProcessRe
         loader_version_range   : rootProject.loader_version_range,
         ftb_library_version_range: rootProject.ftb_library_version_range,
         ftb_essentials_version_range: rootProject.ftb_essentials_version_range,
+        rinlib_version         : rootProject.rinlib_version,
         mod_id                 : rootProject.mod_id,
         mod_name               : rootProject.mod_name,
         mod_license            : rootProject.mod_license,
@@ -55,6 +56,7 @@ neoForge.ideSyncTask tasks.named('generateModMetadata')
 sourceSets.test.java.srcDir rootProject.file('common/src/test/java')
 
 dependencies {
+    implementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.minecraft_version}-neoforge"
     compileOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
     compileOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
@@ -62,6 +64,7 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test', Test).configure {

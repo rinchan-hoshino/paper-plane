@@ -1,3 +1,10 @@
+## 1.1.0 — Minecraft 1.21.1
+
+- Require RinLib 1.0.2 or newer on Fabric and NeoForge.
+- Update the build toolchain for compatibility with RinLib.
+- Run the shared unit tests on both loaders.
+- Refresh the project icon, description and screenshots.
+
 # Changelog
 
 ## 1.0.1
