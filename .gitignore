@@ -1,11 +1,5 @@
-.gradle/
-build/
-*/build/
-run/
-*/run/
-out/
-*.log
-*.hprof
-.idea/
-*.iml
-.vscode/
+**/.gradle/
+**/build/
+**/run/
+__pycache__/
+.DS_Store

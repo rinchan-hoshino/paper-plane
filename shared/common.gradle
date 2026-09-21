@@ -1,0 +1,9 @@
+subprojects {
+    plugins.withType(JavaPlugin).configureEach {
+        sourceSets.main.java.srcDir rootProject.file('../shared/java')
+        if (rootProject.findProperty('legacy_ftb_api') != 'true') {
+            sourceSets.main.java.srcDir rootProject.file('../shared/modern')
+        }
+        sourceSets.test.java.srcDir rootProject.file('../shared/test')
+    }
+}

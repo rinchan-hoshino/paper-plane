@@ -1,0 +1,71 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'net.fabricmc:fabric-loom:1.6.12'
+    }
+}
+
+apply plugin: 'fabric-loom'
+apply plugin: 'maven-publish'
+
+base {
+    archivesName = "${rootProject.mod_id}-fabric"
+}
+
+loom {
+    mixin {
+        defaultRefmapName = 'paper_plane.refmap.json'
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir rootProject.file('common/src/main/java')
+            exclude 'dev/rinchan/paperplane/neoforge/**'
+        }
+        resources.srcDir rootProject.file('common/src/main/resources')
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    implementation(include("io.github.llamalad7:mixinextras-fabric:${rootProject.mixin_extras_version}"))
+
+    modCompileOnly("dev.architectury:architectury-fabric:${rootProject.architectury_fabric_version}") { transitive = false }
+    modCompileOnly("dev.ftb.mods:ftb-library-fabric:${rootProject.ftb_library_version}") { transitive = false }
+    modCompileOnly("dev.ftb.mods:ftb-essentials-fabric:${rootProject.ftb_essentials_version}") { transitive = false }
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand version: project.version
+    }
+}
+
+jar {
+    from(rootProject.file('../LICENSE')) {
+        rename { "${it}_${base.archivesName.get()}" }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${rootProject.mod_id}-fabric"
+            from components.java
+        }
+    }
+}
+
+dependencies { modImplementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.minecraft_version}-fabric" }
+
+dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }

@@ -1,0 +1,45 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.fabricmc.fabric-loom'
+}
+
+def root = rootProject
+
+base { archivesName = "${root.mod_id}-fabric" }
+
+sourceSets.main.java {
+    srcDir root.file('common/src/main/java')
+    exclude 'dev/rinchan/paperplane/neoforge/**'
+}
+sourceSets.main.resources.srcDir root.file('common/src/main/resources')
+
+dependencies {
+    minecraft "com.mojang:minecraft:${root.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${root.fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${root.fabric_api_version}"
+    implementation("dev.ftb.mods:ftb-library-fabric:${root.ftb_library_fabric_version}") { transitive = false }
+    implementation("dev.ftb.mods:ftb-essentials-fabric:${root.ftb_essentials_fabric_version}") { transitive = false }
+    implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1"))
+}
+
+def releaseVersion = root.mod_version
+def fabricArtifactId = "${root.mod_id}-fabric"
+processResources {
+    inputs.property 'version', releaseVersion
+    filesMatching('fabric.mod.json') { expand(version: releaseVersion) }
+}
+
+publishing { publications { mavenJava(MavenPublication) { artifactId = fabricArtifactId; from components.java } } }
+
+dependencies { implementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.minecraft_version}-fabric" }
+
+dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+tasks.named('test', Test).configure { useJUnitPlatform() }
+
+sourceSets.test.java.srcDir rootProject.file('common/src/test/java')

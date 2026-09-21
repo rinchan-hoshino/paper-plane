@@ -1,3 +1,15 @@
+# Changelog
+
+## 1.1.1
+
+- Require RinLib across all supported Minecraft versions and loaders.
+- Share flight physics, selection sessions and modern FTB teleport handling across version profiles.
+- Reject stale selection tokens without invalidating a newer selection screen.
+- Validate the recipient before processing Paper Plane acceptance or denial packets.
+- Correct Fabric dependency ranges on Minecraft 1.19.2 and 1.20.1.
+- Fix item registration during startup on Minecraft 26.1.2.
+- Separate loader-specific code and provide one build matrix for all 17 supported combinations.
+
 ## 1.1.0 — Minecraft 1.21.1
 
 - Require RinLib 1.0.2 or newer on Fabric and NeoForge.
@@ -5,7 +17,6 @@
 - Run the shared unit tests on both loaders.
 - Refresh the project icon, description and screenshots.
 
-# Changelog
 
 ## 1.0.1
 

@@ -1,0 +1,87 @@
+{
+  "1.19.2": {
+    "profile": "1.19.2-1.20.1",
+    "properties": [
+      "-PmcVersion=1.19.2"
+    ],
+    "loaders": [
+      "fabric",
+      "forge"
+    ],
+    "rinlib": "0.2.0",
+    "java": 17
+  },
+  "1.20.1": {
+    "profile": "1.19.2-1.20.1",
+    "properties": [],
+    "loaders": [
+      "fabric",
+      "forge"
+    ],
+    "rinlib": "0.2.0",
+    "java": 17
+  },
+  "1.20.4": {
+    "profile": "1.20.4",
+    "properties": [],
+    "loaders": [
+      "fabric",
+      "forge",
+      "neoforge"
+    ],
+    "rinlib": "1.0.2",
+    "java": 17
+  },
+  "1.20.6": {
+    "profile": "1.20.6-1.21",
+    "properties": [],
+    "loaders": [
+      "fabric",
+      "neoforge"
+    ],
+    "rinlib": "1.0.2",
+    "java": 21
+  },
+  "1.21": {
+    "profile": "1.20.6-1.21",
+    "properties": [
+      "-Pminecraft_version=1.21"
+    ],
+    "loaders": [
+      "fabric",
+      "neoforge"
+    ],
+    "rinlib": "1.0.2",
+    "java": 21
+  },
+  "1.21.1": {
+    "profile": "1.21.1",
+    "properties": [],
+    "loaders": [
+      "fabric",
+      "neoforge"
+    ],
+    "rinlib": "1.0.2",
+    "java": 21
+  },
+  "1.21.11": {
+    "profile": "1.21.11",
+    "properties": [],
+    "loaders": [
+      "fabric",
+      "neoforge"
+    ],
+    "rinlib": "1.0.2",
+    "java": 21
+  },
+  "26.1.2": {
+    "profile": "26.1.2",
+    "properties": [],
+    "loaders": [
+      "fabric",
+      "neoforge"
+    ],
+    "rinlib": "1.0.2",
+    "java": 25
+  }
+}

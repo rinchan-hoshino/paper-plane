@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "paper_plane",
+  "version": "${version}",
+  "name": "Paper Plane",
+  "description": "Turn FTB Essentials teleport requests into items.",
+  "authors": [
+    "RinChan"
+  ],
+  "license": "GPL-3.0-only",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.rinchan.paperplane.fabric.PaperPlaneFabric"
+    ],
+    "client": [
+      "dev.rinchan.paperplane.fabric.PaperPlaneFabricClient"
+    ]
+  },
+  "mixins": [
+    "paper_plane.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.9",
+    "minecraft": "${minecraft_version}",
+    "fabric-api": "*",
+    "architectury": "*",
+    "ftblibrary": "${ftb_library_range}",
+    "ftbessentials": "${ftb_essentials_range}",
+    "rinlib": ">=0.2.0"
+  },
+  "icon": "icon.png"
+}

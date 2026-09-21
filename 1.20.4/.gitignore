@@ -1,0 +1,16 @@
+.gradle/
+.gradle-user-home/
+.probe/
+build/
+*/build/
+run/
+*/run/
+out/
+*.log
+*.hprof
+.idea/
+*.iml
+.vscode/
+
+.gradle-parent/
+tests/__pycache__/

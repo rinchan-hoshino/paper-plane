@@ -1,0 +1,84 @@
+plugins {
+    id 'fabric-loom'
+}
+
+base {
+    archivesName = "${rootProject.mod_id}-fabric"
+}
+
+def profile = rootProject.versionProfile
+
+loom {
+    mixin {
+        defaultRefmapName = 'paper_plane.refmap.json'
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir rootProject.file('common/src/main/java')
+            exclude 'dev/rinchan/paperplane/neoforge/**'
+        }
+        resources.srcDir rootProject.file('common/src/main/resources')
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${profile.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${profile.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${profile.fabric_api_version}"
+    implementation(include("io.github.llamalad7:mixinextras-fabric:${rootProject.mixin_extras_version}"))
+
+    modCompileOnly("dev.ftb.mods:ftb-library-fabric:${profile.ftb_library_version}") { transitive = false }
+    modCompileOnly("dev.ftb.mods:ftb-essentials-fabric:${profile.ftb_essentials_version}") { transitive = false }
+    modCompileOnly("dev.architectury:architectury-fabric:${profile.architectury_version}") { transitive = false }
+}
+
+processResources {
+    def expandProperties = [
+        version: project.version,
+        minecraft_version: profile.minecraft_version,
+        fabric_loader_version_range: profile.fabric_loader_version_range,
+        ftb_library_version_range: profile.ftb_library_version_range,
+        ftb_essentials_version_range: profile.ftb_essentials_version_range
+    ]
+    inputs.properties(expandProperties)
+    filesMatching('fabric.mod.json') {
+        expand(expandProperties)
+    }
+    if (profile.minecraft_version == '1.20.6') {
+        eachFile { details ->
+            details.path = details.path.replace("/recipe/", "/recipes/")
+        }
+    }
+}
+
+tasks.named('jar', Jar) {
+    from(rootProject.file('../LICENSE')) {
+        rename { "LICENSE_${rootProject.mod_id}" }
+    }
+}
+
+tasks.named('remapJar') {
+    dependsOn tasks.named('jar')
+    inputFile = tasks.named('jar').flatMap { it.archiveFile }
+    archiveClassifier = ''
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('remapJar')
+}
+
+dependencies { modImplementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.versionProfile.minecraft_version}-fabric" }
+
+dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+tasks.named('test', Test).configure { useJUnitPlatform() }
+
+sourceSets.test.java.srcDir rootProject.file('common/src/test/java')

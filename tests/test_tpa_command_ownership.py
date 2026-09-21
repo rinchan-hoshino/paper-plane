@@ -5,7 +5,10 @@ import unittest
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY = Path(__file__).resolve().parents[1]
+ROOT = REPOSITORY / "1.21.1"
+NEOFORGE = ROOT / "neoforge/src/main"
+SHARED = REPOSITORY / "shared/modern"
 COMMON = ROOT / "common/src/main"
 
 
@@ -15,7 +18,7 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             (COMMON / "java/dev/rinchan/paperplane/PaperPlaneCommands.java").exists()
         )
         entrypoint = (
-            COMMON / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
+            NEOFORGE / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
         ).read_text(encoding="utf-8")
         self.assertNotIn("RegisterCommandsEvent", entrypoint)
         self.assertNotIn("Commands.literal", entrypoint)
@@ -59,13 +62,13 @@ class TpaCommandOwnershipTest(unittest.TestCase):
 
     def test_server_ledger_decides_handle_or_explicit_fallback(self) -> None:
         entrypoint = (
-            COMMON / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
+            NEOFORGE / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
         ).read_text(encoding="utf-8")
         self.assertIn("RespondTeleportPacket.TYPE", entrypoint)
         self.assertIn("FallbackTeleportResponsePacket", entrypoint)
         self.assertIn("PaperPlane.respondToTeleportRequest", entrypoint)
 
-        source = (COMMON / "java/dev/rinchan/paperplane/PaperPlane.java").read_text(
+        source = (SHARED / "dev/rinchan/paperplane/PaperPlane.java").read_text(
             encoding="utf-8"
         )
         self.assertIn("REQUESTS.isOwnedByTarget(requestId, target.getUUID())", source)
@@ -79,7 +82,7 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             (COMMON / "java/dev/rinchan/paperplane/TrackTeleportRequestPacket.java").exists()
         )
         neoforge = (
-            COMMON / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
+            NEOFORGE / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
         ).read_text(encoding="utf-8")
         fabric = (
             ROOT / "fabric/src/main/java/dev/rinchan/paperplane/fabric/PaperPlaneFabric.java"
@@ -100,7 +103,7 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 properties[key] = value
-        self.assertEqual("1.0.1", properties["mod_version"])
+        self.assertEqual("1.1.1", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
         self.assertEqual("8442866", properties["ftb_essentials_file_id"])
 
