@@ -1,5 +1,7 @@
 # Paper Plane
 
+<img src="docs/artwork/icon-platform.png" alt="Paper Plane" width="128" height="128">
+
 Paper Plane lets players use paper planes to send FTB Essentials `/tpa` requests, even when the `/tpa` command is disabled.
 
 ## Requirements
