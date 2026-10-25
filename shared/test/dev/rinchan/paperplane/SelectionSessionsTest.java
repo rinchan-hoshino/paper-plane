@@ -5,6 +5,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class SelectionSessionsTest {
+    @Test void rapidRepeatedUseDoesNotInvalidateTheVisiblePicker() {
+        SelectionSessions sessions = new SelectionSessions();
+        UUID player = UUID.randomUUID();
+        UUID visible = sessions.open(player, PlaneKind.NORMAL, 100);
+        for (long tick = 101; tick < 106; tick++) {
+            assertEquals(visible, sessions.open(player, PlaneKind.NORMAL, tick));
+        }
+        assertEquals(PlaneKind.NORMAL, sessions.consume(player, visible, 106).orElseThrow());
+    }
+    @Test void repeatedUseCannotKeepAnExpiredPickerAlive() {
+        SelectionSessions sessions = new SelectionSessions();
+        UUID player = UUID.randomUUID();
+        UUID first = sessions.open(player, PlaneKind.NORMAL, 0);
+        sessions.open(player, PlaneKind.NORMAL, 599);
+        UUID next = sessions.open(player, PlaneKind.NORMAL, 600);
+        assertNotEquals(first, next);
+        assertTrue(sessions.consume(player, first, 601).isEmpty());
+        assertEquals(PlaneKind.NORMAL, sessions.consume(player, next, 601).orElseThrow());
+    }
     @Test void stalePacketCannotConsumeNewSelection() {
         SelectionSessions sessions = new SelectionSessions();
         UUID player = UUID.randomUUID();

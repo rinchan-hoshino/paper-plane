@@ -11,6 +11,12 @@ public final class SelectionSessions {
     private final Map<UUID, Session> sessions = new HashMap<>();
 
     public UUID open(UUID player, PlaneKind kind, long now) {
+        Session active = sessions.get(player);
+        // Holding use can queue several openings before the visible picker is clicked.
+        // Reuse its authority rather than invalidating an otherwise valid selection.
+        if (active != null && active.kind() == kind && now < active.expiresAt()) {
+            return active.token();
+        }
         UUID token = UUID.randomUUID();
         sessions.put(player, new Session(token, kind, now + LIFETIME_TICKS));
         return token;

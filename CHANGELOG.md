@@ -1,3 +1,7 @@
+# 1.1.2 — Minecraft 1.21.1 NeoForge
+
+Paper Plane 1.1.2 for Minecraft 1.21.1 NeoForge fixes spurious expired-selection errors when repeatedly using the same paper plane while the player picker is open. The original expiration deadline remains unchanged and selections can still only be submitted once, while changing plane types or disconnecting continues to cancel the previous selection.
+
 # Changelog
 
 ## 1.1.1
