@@ -5,7 +5,10 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ItemEntityMixin",
-    "TPACommandMixin"
+    "TPACommandMixin",
+    "NativeTeleportMixin",
+    "NativeWarmupMixin",
+    "BackCommandInvoker"
   ],
   "client": [
     "ClientPacketListenerMixin"

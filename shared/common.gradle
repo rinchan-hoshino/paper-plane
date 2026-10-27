@@ -1,10 +1,21 @@
 subprojects {
     plugins.withType(JavaPlugin).configureEach {
         tasks.withType(Jar).configureEach { from(rootProject.file('../LICENSE')) }
+        dependencies {
+            implementation 'com.electronwill.night-config:toml:3.8.3'
+        }
         sourceSets.main.java.srcDir rootProject.file('../shared/java')
         if (rootProject.findProperty('legacy_ftb_api') != 'true') {
             sourceSets.main.java.srcDir rootProject.file('../shared/modern')
         }
+        def nativeApi = rootProject.projectDir.name == '1.21.1' ? 'api' :
+            (rootProject.projectDir.name in ['1.21.11', '26.1.2'] ? 'position' : 'function')
+        sourceSets.main.java.srcDir rootProject.file("../shared/native-${nativeApi}")
         sourceSets.test.java.srcDir rootProject.file('../shared/test')
+    }
+
+    configurations.matching { it.name == 'include' }.configureEach {
+        project.dependencies.add('include', 'com.electronwill.night-config:core:3.8.3')
+        project.dependencies.add('include', 'com.electronwill.night-config:toml:3.8.3')
     }
 }

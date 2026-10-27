@@ -1,0 +1,1 @@
+{"required":true,"minVersion":"0.8","package":"dev.rinchan.paperplane.mixin","compatibilityLevel":"JAVA_21","mixins":["NativeTeleportMixin","NativeWarmupMixin","BackCommandInvoker","TPACommandMixin"],"injectors":{"defaultRequire":1}}

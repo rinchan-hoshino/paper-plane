@@ -18,6 +18,8 @@ public final class PaperPlaneFabricCreativeTabs {
             entries.accept(PaperPlaneRegistries.PAPER_PLANE.get());
             entries.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             entries.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
+            entries.accept(PaperPlaneRegistries.BACK_PAPER_PLANE.get());
+            entries.accept(PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());
         });
     }
 }

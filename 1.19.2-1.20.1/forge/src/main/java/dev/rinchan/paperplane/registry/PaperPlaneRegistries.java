@@ -27,6 +27,12 @@ public final class PaperPlaneRegistries {
     public static final RegistryObject<Item> ENDER_PAPER_PLANE = ITEMS.register(
         "ender_paper_plane", () -> new PaperPlaneForgeItem(PaperPlaneForgeCreativeTabs.configure(new Item.Properties().stacksTo(1).fireResistant()), PlaneKind.ENDER)
     );
+    public static final RegistryObject<Item> BACK_PAPER_PLANE = ITEMS.register(
+        "back_paper_plane", () -> new PaperPlaneForgeItem(PaperPlaneForgeCreativeTabs.configure(new Item.Properties().stacksTo(16)), PlaneKind.BACK)
+    );
+    public static final RegistryObject<Item> ENDER_BACK_PAPER_PLANE = ITEMS.register(
+        "ender_back_paper_plane", () -> new PaperPlaneForgeItem(PaperPlaneForgeCreativeTabs.configure(new Item.Properties().stacksTo(1).fireResistant()), PlaneKind.ENDER_BACK)
+    );
     public static final RegistryObject<EntityType<PaperPlaneEntity>> PAPER_PLANE_ENTITY = ENTITY_TYPES.register(
         "paper_plane",
         () -> EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC)

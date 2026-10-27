@@ -30,6 +30,14 @@ public final class PaperPlaneRegistries {
         "ender_paper_plane",
         () -> new PaperPlaneItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), PlaneKind.ENDER)
     );
+    public static final Supplier<Item> BACK_PAPER_PLANE = ITEMS.register(
+        "back_paper_plane",
+        () -> new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.BACK)
+    );
+    public static final Supplier<Item> ENDER_BACK_PAPER_PLANE = ITEMS.register(
+        "ender_back_paper_plane",
+        () -> new PaperPlaneItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), PlaneKind.ENDER_BACK)
+    );
 
     public static final Supplier<EntityType<PaperPlaneEntity>> PAPER_PLANE_ENTITY = ENTITY_TYPES.register(
         "paper_plane",

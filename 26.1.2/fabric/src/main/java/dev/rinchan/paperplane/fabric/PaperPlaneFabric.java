@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public final class PaperPlaneFabric implements ModInitializer {
     @Override public void onInitialize() {
+        PaperPlane.configure(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir());
         PaperPlaneRegistries.register();
         PayloadTypeRegistry.serverboundPlay().register(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC);

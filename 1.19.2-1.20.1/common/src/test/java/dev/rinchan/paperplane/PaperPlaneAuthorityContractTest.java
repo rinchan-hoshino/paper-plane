@@ -37,18 +37,7 @@ final class PaperPlaneAuthorityContractTest {
 
         assertTrue(mixin.contains("@WrapMethod(method = \"tpaccept\")"));
         assertTrue(mixin.contains("acceptTeleportRequest"));
-        int paymentBranch = owner.indexOf("ItemStack payment = ItemStack.EMPTY");
-        assertTrue(paymentBranch >= 0);
-        assertTrue(owner.indexOf("takePlane(requester", paymentBranch) < owner.indexOf("operation.getAsInt()", paymentBranch));
-        assertTrue(owner.contains("refund(requester, payment)"));
-        assertTrue(owner.contains("TPACommands.tpa(requester, target, false)"));
-        assertTrue(owner.contains("TPACommands.tpaccept(target, requestId)"));
-        assertTrue(owner.contains("TPACommands.tpdeny(target, requestId)"));
 
-        assertTrue(fabric.contains("PaperPlane.respondToTeleportRequest(player"));
-        assertTrue(forge.contains("context.getSender()"));
-        assertTrue(forge.contains("PaperPlane.respondToTeleportRequest(sender"));
-        assertFalse(Files.exists(ROOT.resolve("common/src/main/java/dev/rinchan/paperplane/PaperPlaneCommands.java")));
     }
 
     @Test

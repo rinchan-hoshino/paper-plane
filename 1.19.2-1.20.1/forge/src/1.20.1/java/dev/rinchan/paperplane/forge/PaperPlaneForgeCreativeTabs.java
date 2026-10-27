@@ -23,6 +23,8 @@ public final class PaperPlaneForgeCreativeTabs {
             event.accept(PaperPlaneRegistries.PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
+            event.accept(PaperPlaneRegistries.BACK_PAPER_PLANE.get());
+            event.accept(PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());
         }
     }
 }

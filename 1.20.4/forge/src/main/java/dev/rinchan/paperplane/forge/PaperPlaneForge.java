@@ -19,6 +19,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public final class PaperPlaneForge {
     public PaperPlaneForge() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        PaperPlane.configure(net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get());
         PaperPlaneRegistries.register(modBus);
         PaperPlaneNetworking.register();
         modBus.addListener(this::addCreativeTabContents);
@@ -31,6 +32,8 @@ public final class PaperPlaneForge {
             event.accept(PaperPlaneRegistries.PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
+            event.accept(PaperPlaneRegistries.BACK_PAPER_PLANE.get());
+            event.accept(PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());
         }
     }
 

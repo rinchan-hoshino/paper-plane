@@ -25,7 +25,7 @@
     "minecraft": "1.21.1",
     "fabric-api": "*",
     "ftblibrary": ">=2101.1.31 <2102",
-    "ftbessentials": ">=2101.1.5 <2102",
+    "ftbessentials": ">=2101.1.10 <2102",
     "rinlib": ">=1.0.2"
   },
   "icon": "icon.png"

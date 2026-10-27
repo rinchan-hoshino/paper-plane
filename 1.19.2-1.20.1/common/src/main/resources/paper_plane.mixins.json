@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ItemEntityMixin",
-    "TPACommandMixin"
+    "TPACommandMixin",
+    "NativeTeleportMixin",
+    "NativeWarmupMixin"
   ],
   "client": [
     "ScreenMixin"

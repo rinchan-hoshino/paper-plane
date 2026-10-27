@@ -37,7 +37,7 @@ final class PaperPlaneTextureRepairContractTest {
         assertFalse(Files.exists(modelPath.resolveSibling("paper_plane.obj")));
         assertFalse(Files.exists(modelPath.resolveSibling("paper_plane.mtl")));
 
-        for (String variant : new String[] {"soggy", "ender"}) {
+        for (String variant : new String[] {"soggy", "ender", "back", "ender_back"}) {
             String child = Files.readString(modelPath.resolveSibling(variant + "_paper_plane.json"));
             assertTrue(child.contains("\"edge\": \"paper_plane:item/" + variant + "_paper_plane_edge\""));
         }
@@ -46,7 +46,7 @@ final class PaperPlaneTextureRepairContractTest {
     @Test
     void eachTopTextureHasOnePointedConnectedIntegerAxisSymmetricSilhouette() throws Exception {
         Set<Integer> referenceMask = null;
-        for (String name : new String[] {"paper_plane", "soggy_paper_plane", "ender_paper_plane"}) {
+        for (String name : new String[] {"paper_plane", "soggy_paper_plane", "ender_paper_plane", "back_paper_plane", "ender_back_paper_plane"}) {
             BufferedImage image = image(name + ".png");
             assertEquals(16, image.getWidth());
             assertEquals(16, image.getHeight());
@@ -65,7 +65,7 @@ final class PaperPlaneTextureRepairContractTest {
 
     @Test
     void edgeTexturesAreOpaqueSingleColourPixelsWithoutSpacerFallback() throws Exception {
-        for (String name : new String[] {"paper_plane_edge", "soggy_paper_plane_edge", "ender_paper_plane_edge"}) {
+        for (String name : new String[] {"paper_plane_edge", "soggy_paper_plane_edge", "ender_paper_plane_edge", "back_paper_plane_edge", "ender_back_paper_plane_edge"}) {
             BufferedImage image = image(name + ".png");
             assertEquals(16, image.getWidth());
             assertEquals(16, image.getHeight());

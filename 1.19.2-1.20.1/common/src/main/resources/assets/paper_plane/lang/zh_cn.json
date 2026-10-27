@@ -13,5 +13,9 @@
   "message.paper_plane.pending_unknown": "你已经有一个待处理的纸飞机传送请求。",
   "message.paper_plane.selection_expired": "这次纸飞机选择已过期，请重新使用纸飞机。",
   "message.paper_plane.no_selected_plane": "你已经不再持有这次请求所用的纸飞机。",
-  "message.paper_plane.requester_no_plane": "请求者已经不再持有需要的纸飞机。"
+  "message.paper_plane.requester_no_plane": "请求者已经不再持有需要的纸飞机。",
+  "item.paper_plane.back_paper_plane": "返航纸飞机",
+  "item.paper_plane.ender_back_paper_plane": "末影返航纸飞机",
+  "message.paper_plane.tpa_disabled": "服务器已禁用传送纸飞机功能。",
+  "message.paper_plane.back_disabled": "服务器已禁用返航纸飞机功能。"
 }

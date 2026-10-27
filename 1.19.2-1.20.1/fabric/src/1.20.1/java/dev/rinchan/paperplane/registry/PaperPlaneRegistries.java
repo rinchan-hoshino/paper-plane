@@ -32,6 +32,16 @@ public final class PaperPlaneRegistries {
         id("ender_paper_plane"),
         new PaperPlaneItem(PaperPlaneFabricCreativeTabs.configure(new Item.Properties().stacksTo(1).fireResistant()), PlaneKind.ENDER)
     ));
+    public static final Supplier<Item> BACK_PAPER_PLANE = memoize(() -> Registry.register(
+        BuiltInRegistries.ITEM,
+        id("back_paper_plane"),
+        new PaperPlaneItem(PaperPlaneFabricCreativeTabs.configure(new Item.Properties().stacksTo(16)), PlaneKind.BACK)
+    ));
+    public static final Supplier<Item> ENDER_BACK_PAPER_PLANE = memoize(() -> Registry.register(
+        BuiltInRegistries.ITEM,
+        id("ender_back_paper_plane"),
+        new PaperPlaneItem(PaperPlaneFabricCreativeTabs.configure(new Item.Properties().stacksTo(1).fireResistant()), PlaneKind.ENDER_BACK)
+    ));
     public static final Supplier<EntityType<PaperPlaneEntity>> PAPER_PLANE_ENTITY = memoize(() -> Registry.register(
         BuiltInRegistries.ENTITY_TYPE,
         id("paper_plane"),
@@ -49,6 +59,8 @@ public final class PaperPlaneRegistries {
         PAPER_PLANE.get();
         SOGGY_PAPER_PLANE.get();
         ENDER_PAPER_PLANE.get();
+        BACK_PAPER_PLANE.get();
+        ENDER_BACK_PAPER_PLANE.get();
         PAPER_PLANE_ENTITY.get();
     }
 

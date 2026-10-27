@@ -22,6 +22,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 @Mod(PaperPlane.MOD_ID)
 public class PaperPlaneNeoForge {
     public PaperPlaneNeoForge(IEventBus modBus) {
+        PaperPlane.configure(net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get());
         PaperPlaneRegistries.register(modBus);
         modBus.addListener(this::registerPayloads);
         modBus.addListener(this::addCreativeTabItems);
@@ -62,6 +63,8 @@ public class PaperPlaneNeoForge {
             event.accept(PaperPlaneRegistries.PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
+            event.accept(PaperPlaneRegistries.BACK_PAPER_PLANE.get());
+            event.accept(PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());
         }
     }
 

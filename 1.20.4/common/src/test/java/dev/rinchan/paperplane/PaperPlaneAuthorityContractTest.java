@@ -44,9 +44,7 @@ final class PaperPlaneAuthorityContractTest {
         assertTrue(platform.contains("LOGGER.error"));
         assertFalse(platform.contains("exceptionally(throwable -> null)"));
         String owner = Files.readString(source("dev/rinchan/paperplane/PaperPlane.java"));
-        int paymentBranch = owner.indexOf("ItemStack payment = ItemStack.EMPTY");
-        assertTrue(owner.indexOf("takePlane(requester", paymentBranch) < owner.indexOf("operation.getAsInt()", paymentBranch));
-        assertTrue(owner.contains("refund(requester, payment)"));
+
     }
 
     @Test

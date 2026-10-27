@@ -67,6 +67,7 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.mockito:mockito-core:5.20.0'
+    testRuntimeOnly 'dev.architectury:architectury-neoforge:13.0.8'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -83,3 +84,34 @@ publishing {
         }
     }
 }
+
+// Exercise the real FTB classes after Sponge applies our native teleport mixins.
+sourceSets {
+    nativeProof {
+        compileClasspath += sourceSets.test.runtimeClasspath
+        runtimeClasspath += sourceSets.test.runtimeClasspath
+    }
+}
+dependencies { nativeProofImplementation 'io.github.llamalad7:mixinextras-common:0.4.1' }
+def nativeTeleportClasses = layout.buildDirectory.dir('native-teleport-proof/classes')
+def applyNativeTeleportMixins = tasks.register('applyNativeTeleportMixins', JavaExec) {
+    dependsOn tasks.named('testClasses'), tasks.named('nativeProofClasses')
+    classpath = sourceSets.nativeProof.runtimeClasspath
+    mainClass = 'proof.Apply'
+    systemProperty 'proof.output', nativeTeleportClasses.get().asFile.absolutePath
+    args 'dev.ftb.mods.ftbessentials.util.WarmupCooldownTeleporter',
+         'dev.ftb.mods.ftbessentials.commands.groups.TeleportingCommands',
+         'dev.ftb.mods.ftbessentials.commands.impl.teleporting.TPACommand',
+         'dev.rinchan.paperplane.mixin.BackCommandInvoker'
+    outputs.dir(nativeTeleportClasses)
+}
+def nativeTeleportTest = tasks.register('nativeTeleportTest', JavaExec) {
+    dependsOn applyNativeTeleportMixins
+    classpath = files(nativeTeleportClasses) + sourceSets.nativeProof.runtimeClasspath
+    mainClass = 'proof.RunTests'
+    args 'dev.rinchan.paperplane.NativeWarmupPaymentTest',
+         'dev.rinchan.paperplane.NativeTeleportSettingsTest',
+         'dev.rinchan.paperplane.NativeAppliedTeleportTest',
+         'dev.rinchan.paperplane.NativeBackRecipeTest'
+}
+tasks.named('check') { dependsOn nativeTeleportTest }

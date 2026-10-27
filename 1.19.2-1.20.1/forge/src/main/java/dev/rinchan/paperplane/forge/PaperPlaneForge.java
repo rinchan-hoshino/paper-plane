@@ -15,6 +15,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public final class PaperPlaneForge {
     public PaperPlaneForge() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        PaperPlane.configure(net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get());
         PaperPlaneRegistries.register(modBus);
         PaperPlaneForgeCreativeTabs.register(modBus);
         PaperPlaneNetworking.register();

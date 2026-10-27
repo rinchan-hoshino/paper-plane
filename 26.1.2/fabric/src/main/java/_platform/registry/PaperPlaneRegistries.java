@@ -22,11 +22,15 @@ public final class PaperPlaneRegistries {
     private static Item normal;
     private static Item soggy;
     private static Item ender;
+    private static Item back;
+    private static Item enderBack;
     private static EntityType<PaperPlaneEntity> entity;
 
     public static final Supplier<Item> PAPER_PLANE = () -> normal;
     public static final Supplier<Item> SOGGY_PAPER_PLANE = () -> soggy;
     public static final Supplier<Item> ENDER_PAPER_PLANE = () -> ender;
+    public static final Supplier<Item> BACK_PAPER_PLANE = () -> back;
+    public static final Supplier<Item> ENDER_BACK_PAPER_PLANE = () -> enderBack;
     public static final Supplier<EntityType<PaperPlaneEntity>> PAPER_PLANE_ENTITY = () -> entity;
 
     private PaperPlaneRegistries() {
@@ -36,6 +40,8 @@ public final class PaperPlaneRegistries {
         normal = registerItem("paper_plane", properties -> new PaperPlaneItem(properties, PlaneKind.NORMAL), properties -> properties.stacksTo(16));
         soggy = registerItem("soggy_paper_plane", SoggyPaperPlaneItem::new, properties -> properties.stacksTo(16));
         ender = registerItem("ender_paper_plane", properties -> new PaperPlaneItem(properties, PlaneKind.ENDER), properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
+        back = registerItem("back_paper_plane", properties -> new PaperPlaneItem(properties, PlaneKind.BACK), properties -> properties.stacksTo(16));
+        enderBack = registerItem("ender_back_paper_plane", properties -> new PaperPlaneItem(properties, PlaneKind.ENDER_BACK), properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
 
         Identifier identifier = id("paper_plane");
         ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, identifier);

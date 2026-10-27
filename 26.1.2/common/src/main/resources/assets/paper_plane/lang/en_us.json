@@ -13,5 +13,9 @@
   "message.paper_plane.pending_unknown": "You already have a pending paper-plane request.",
   "message.paper_plane.selection_expired": "That paper-plane selection expired. Use the plane again.",
   "message.paper_plane.no_selected_plane": "You no longer have the paper plane used for this request.",
-  "message.paper_plane.requester_no_plane": "The requester no longer has the required paper plane."
+  "message.paper_plane.requester_no_plane": "The requester no longer has the required paper plane.",
+  "item.paper_plane.back_paper_plane": "Back Paper Plane",
+  "item.paper_plane.ender_back_paper_plane": "Ender Back Paper Plane",
+  "message.paper_plane.tpa_disabled": "TPA paper planes are disabled on this server.",
+  "message.paper_plane.back_disabled": "Back paper planes are disabled on this server."
 }

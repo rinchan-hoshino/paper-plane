@@ -1,3 +1,18 @@
+## Paper Plane 1.3.0
+
+### New Features
+* **Back Paper Plane & Ender Back Paper Plane**: Added two new items providing return teleportation via right-click.
+  * Uses FTB Essentials' native previous-position history and configured rules.
+  * **Back Paper Plane**: Single-use item crafted with 4 Bone Meal in a cross pattern around a Paper Plane. Consumed only after a teleport completes successfully.
+  * **Ender Back Paper Plane**: Reusable item crafted by surrounding a Back Paper Plane with 8 Ender Pearls. Never consumed.
+  * Visuals retain the exact existing 16x16 silhouette, folds, and alpha, using recolored palettes.
+* **Server Configuration**: Added `enableTpa` and `enableBack` toggles in `config/paper_plane.toml` to enable or disable plane abilities independently of FTB public command registration. Settings load on server start (server restart required after edits).
+
+### Fixes & Improvements
+* **Consumption Timing**: Single-use paper planes now consume only upon actual movement completion. Warmup cancellations, interruptions, or failed teleports no longer consume the item.
+* **Item Behavior**: Retains non-throwable, right-click interaction established in 1.2.0 across all 17 supported combinations, including original TPA planes and the Soggy variant.
+- Corrected the minimum FTB Essentials runtime dependency for Minecraft 1.21.1 (Fabric and NeoForge) to 2101.1.10 or newer within the 2101 series.
+
 ## Paper Plane 1.2.0
 
 ### Changes & Improvements

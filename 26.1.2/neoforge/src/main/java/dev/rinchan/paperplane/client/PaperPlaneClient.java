@@ -30,7 +30,7 @@ public final class PaperPlaneClient {
     }
 
     private static void registerClientExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(PaperPlaneClientItemExtensions.INSTANCE, PaperPlaneRegistries.PAPER_PLANE.get(), PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
+        event.registerItem(PaperPlaneClientItemExtensions.INSTANCE, PaperPlaneRegistries.PAPER_PLANE.get(), PaperPlaneRegistries.ENDER_PAPER_PLANE.get(), PaperPlaneRegistries.BACK_PAPER_PLANE.get(), PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());
     }
 
     private static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {

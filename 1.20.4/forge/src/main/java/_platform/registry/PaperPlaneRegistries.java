@@ -23,6 +23,10 @@ public final class PaperPlaneRegistries {
         new SoggyPaperPlaneItem(new Item.Properties().stacksTo(16)));
     public static final Supplier<Item> ENDER_PAPER_PLANE = ITEMS.register("ender_paper_plane", () ->
         new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.ENDER));
+    public static final Supplier<Item> BACK_PAPER_PLANE = ITEMS.register("back_paper_plane", () ->
+        new PaperPlaneItem(new Item.Properties().stacksTo(16), PlaneKind.BACK));
+    public static final Supplier<Item> ENDER_BACK_PAPER_PLANE = ITEMS.register("ender_back_paper_plane", () ->
+        new PaperPlaneItem(new Item.Properties().stacksTo(1), PlaneKind.ENDER_BACK));
     public static final Supplier<EntityType<PaperPlaneEntity>> PAPER_PLANE_ENTITY = ENTITY_TYPES.register("paper_plane", () ->
         EntityType.Builder.<PaperPlaneEntity>of(PaperPlaneEntity::new, MobCategory.MISC)
             .sized(0.5F, 0.125F)

@@ -23,7 +23,7 @@ class PaperPlaneUseTest {
     }
 
     @ParameterizedTest @EnumSource(PlaneKind.class)
-    void crouchingUseOpensThePickerWithoutChargingThrowingOrConsuming(PlaneKind kind) {
+    void crouchingUseDelegatesToTheServerWithoutChargingThrowingOrConsuming(PlaneKind kind) {
         var level = mock(ServerLevel.class);
         var player = mock(ServerPlayer.class);
         var held = new ItemStack(Items.PAPER,3);

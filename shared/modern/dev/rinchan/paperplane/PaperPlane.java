@@ -21,17 +21,41 @@ public final class PaperPlane {
     private static final TPACommand FTB_TPA = new TPACommand();
     private static final TeleportRequestLedger REQUESTS = new TeleportRequestLedger();
     private static final SelectionSessions SELECTIONS = new SelectionSessions();
+    private static PaperPlaneConfig config = new PaperPlaneConfig(true, true);
 
     private PaperPlane() {
     }
 
+    public static void configure(java.nio.file.Path directory) {
+        try {
+            config = PaperPlaneConfig.load(directory);
+        } catch (java.io.IOException failure) {
+            throw new java.io.UncheckedIOException("Cannot load Paper Plane configuration", failure);
+        }
+    }
+
+    private static boolean enabled(ServerPlayer player, boolean returning) {
+        if (returning ? config.enableBack() : config.enableTpa()) return true;
+        player.sendSystemMessage(Component.translatable(returning ? "message.paper_plane.back_disabled" : "message.paper_plane.tpa_disabled").withStyle(ChatFormatting.RED));
+        return false;
+    }
+
     public static void openTeleportScreen(ServerPlayer player, PlaneKind planeKind) {
+        if (!enabled(player, planeKind.returning())) return;
+        if (planeKind.returning()) {
+            returnToPreviousLocation(player, planeKind);
+            return;
+        }
         reconcilePending(player);
         Optional<TeleportRequestLedger.Pending> pending = REQUESTS.pendingFor(player.getUUID());
         if (pending.isPresent()) {
             ServerPlayer target = PaperPlanePlatform.server(player).getPlayerList().getPlayer(pending.get().targetId());
             String name = target == null ? pending.get().targetId().toString() : PaperPlanePlatform.playerName(target);
             player.sendSystemMessage(Component.translatable("message.paper_plane.pending", name).withStyle(ChatFormatting.YELLOW));
+            return;
+        }
+        if (TeleportPayments.pending(player.getUUID())) {
+            player.sendSystemMessage(Component.translatable("message.paper_plane.pending_unknown").withStyle(ChatFormatting.YELLOW));
             return;
         }
         if (findPlaneSlot(player, planeKind) < 0) {
@@ -46,7 +70,29 @@ public final class PaperPlane {
         );
     }
 
+    private static void returnToPreviousLocation(ServerPlayer player, PlaneKind kind) {
+        reconcilePending(player);
+        if (REQUESTS.hasPending(player.getUUID()) || TeleportPayments.pending(player.getUUID())) {
+            player.sendSystemMessage(Component.translatable("message.paper_plane.pending_unknown").withStyle(ChatFormatting.YELLOW));
+            return;
+        }
+        if (!hasPlane(player, kind)) {
+            player.sendSystemMessage(Component.translatable("message.paper_plane.no_selected_plane").withStyle(ChatFormatting.RED));
+            return;
+        }
+        var data = FtbPlayerData.get(player);
+        if (data.isEmpty()) return;
+        TeleportPayments.begin(player, kind, data.get().backTeleporter);
+        try {
+            if (FtbBack.run(player) <= 0) TeleportPayments.failed(player.getUUID());
+        } catch (RuntimeException | Error failure) {
+            TeleportPayments.failed(player.getUUID());
+            throw failure;
+        }
+    }
+
     public static void requestTeleport(ServerPlayer requester, UUID sessionId, UUID targetId) {
+        if (!enabled(requester, false)) return;
         Optional<PlaneKind> selection = SELECTIONS.consume(requester.getUUID(), sessionId, PaperPlanePlatform.server(requester).overworld().getGameTime());
         if (selection.isEmpty()) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.selection_expired").withStyle(ChatFormatting.RED));
@@ -54,7 +100,7 @@ public final class PaperPlane {
         }
 
         reconcilePending(requester);
-        if (REQUESTS.hasPending(requester.getUUID())) {
+        if (REQUESTS.hasPending(requester.getUUID()) || TeleportPayments.pending(requester.getUUID())) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.pending_unknown").withStyle(ChatFormatting.YELLOW));
             return;
         }
@@ -126,31 +172,37 @@ public final class PaperPlane {
             return operation.getAsInt();
         }
 
-        ItemStack payment = ItemStack.EMPTY;
-        if (pending.planeKind().consumable() && !requester.getAbilities().instabuild) {
-            payment = takePlane(requester, pending.planeKind());
-            if (payment.isEmpty()) {
-                requester.sendSystemMessage(Component.translatable("message.paper_plane.no_selected_plane").withStyle(ChatFormatting.RED));
-                target.sendSystemMessage(Component.translatable("message.paper_plane.requester_no_plane").withStyle(ChatFormatting.RED));
-                return 0;
-            }
+        if (!enabled(requester, false) || TeleportPayments.pending(requester.getUUID())) return 0;
+        if (!hasPlane(requester, pending.planeKind())) {
+            requester.sendSystemMessage(Component.translatable("message.paper_plane.no_selected_plane").withStyle(ChatFormatting.RED));
+            target.sendSystemMessage(Component.translatable("message.paper_plane.requester_no_plane").withStyle(ChatFormatting.RED));
+            return 0;
         }
-
+        var data = FtbPlayerData.get(requester);
+        if (data.isEmpty()) return 0;
+        TeleportPayments.begin(requester, pending.planeKind(), data.get().tpaTeleporter);
         try {
             int result = operation.getAsInt();
-            if (result > 0) {
-                clearRequest(id);
-            } else {
-                refund(requester, payment);
-                if (!TPACommand.requests().containsKey(id)) {
-                    clearRequest(id);
-                }
-            }
+            if (result <= 0) TeleportPayments.failed(requester.getUUID());
             return result;
         } catch (RuntimeException | Error failure) {
-            refund(requester, payment);
+            TeleportPayments.failed(requester.getUUID());
             throw failure;
         }
+    }
+
+    /** Called only after the native teleporter has actually moved the player. */
+    public static void finishTeleport(ServerPlayer player, PlaneKind kind) {
+        TeleportPayments.finish(player.getUUID());
+        discardPendingRequest(player.getUUID());
+    }
+
+    static void discardPendingRequest(UUID player) {
+        REQUESTS.pendingFor(player).ifPresent(pending -> clearRequest(pending.requestId()));
+    }
+
+    static boolean hasPlane(ServerPlayer player, PlaneKind kind) {
+        return findPlaneSlot(player, kind) >= 0;
     }
 
     public static void forgetDeniedRequest(ServerPlayer target, UUID requestId, int result) {
@@ -162,6 +214,7 @@ public final class PaperPlane {
     }
 
     public static void clearPlayer(ServerPlayer player) {
+        TeleportPayments.finish(player.getUUID());
         SELECTIONS.remove(player.getUUID());
         for (TeleportRequestLedger.Pending pending : REQUESTS.removePlayer(player.getUUID())) {
             TPACommand.requests().remove(pending.requestId());
@@ -169,8 +222,12 @@ public final class PaperPlane {
     }
 
     private static void reconcilePending(ServerPlayer player) {
-        REQUESTS.pendingFor(player.getUUID())
-            .filter(pending -> !TPACommand.requests().containsKey(pending.requestId()))
+        reconcileRequest(player.getUUID());
+    }
+
+    static void reconcileRequest(UUID player) {
+        REQUESTS.pendingFor(player)
+            .filter(pending -> !TeleportPayments.pending(player) && !TPACommand.requests().containsKey(pending.requestId()))
             .ifPresent(pending -> clearRequest(pending.requestId()));
     }
 
@@ -190,7 +247,7 @@ public final class PaperPlane {
         return null;
     }
 
-    private static ItemStack takePlane(ServerPlayer player, PlaneKind planeKind) {
+    static ItemStack takePlane(ServerPlayer player, PlaneKind planeKind) {
         int slot = findPlaneSlot(player, planeKind);
         if (slot < 0) {
             return ItemStack.EMPTY;
@@ -202,7 +259,7 @@ public final class PaperPlane {
         return payment;
     }
 
-    private static void refund(ServerPlayer player, ItemStack payment) {
+    static void refund(ServerPlayer player, ItemStack payment) {
         if (!payment.isEmpty() && !player.getInventory().add(payment)) {
             player.drop(payment, false);
         }
@@ -213,6 +270,8 @@ public final class PaperPlane {
             case NORMAL -> PaperPlaneRegistries.PAPER_PLANE.get();
             case SOGGY -> PaperPlaneRegistries.SOGGY_PAPER_PLANE.get();
             case ENDER -> PaperPlaneRegistries.ENDER_PAPER_PLANE.get();
+            case BACK -> PaperPlaneRegistries.BACK_PAPER_PLANE.get();
+            case ENDER_BACK -> PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get();
         };
         for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
             if (player.getInventory().getItem(slot).is(item)) {

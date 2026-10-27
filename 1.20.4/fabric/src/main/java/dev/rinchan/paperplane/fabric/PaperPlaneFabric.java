@@ -13,11 +13,14 @@ import net.minecraft.world.item.CreativeModeTabs;
 public final class PaperPlaneFabric implements ModInitializer {
     @Override
     public void onInitialize() {
+        PaperPlane.configure(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir());
         PaperPlaneRegistries.register();
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
             entries.accept(PaperPlaneRegistries.PAPER_PLANE.get());
             entries.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             entries.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
+            entries.accept(PaperPlaneRegistries.BACK_PAPER_PLANE.get());
+            entries.accept(PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());
         });
         ServerPlayNetworking.registerGlobalReceiver(RequestTeleportPacket.ID, (server, player, handler, buffer, responseSender) -> {
             RequestTeleportPacket packet = RequestTeleportPacket.decode(buffer);
