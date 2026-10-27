@@ -1,23 +1,18 @@
 package dev.rinchan.paperplane;
 
 public enum PlaneKind {
-    NORMAL(true, true),
-    SOGGY(true, false),
-    ENDER(false, true);
+    NORMAL(true),
+    SOGGY(true),
+    ENDER(false);
 
     private final boolean consumable;
-    private final boolean throwable;
 
-    PlaneKind(boolean consumable, boolean throwable) {
+    PlaneKind(boolean consumable) {
         this.consumable = consumable;
-        this.throwable = throwable;
     }
 
     public boolean consumable() {
         return consumable;
     }
 
-    public boolean throwable() {
-        return throwable;
-    }
 }

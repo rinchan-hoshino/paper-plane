@@ -4,6 +4,8 @@
 
 Paper Plane lets players use paper planes to send FTB Essentials `/tpa` requests, even when the `/tpa` command is disabled.
 
+Starting in 1.2.0 (Minecraft 1.21.1 / NeoForge), right-clicking or sneak-right-clicking with any paper plane directly opens the player selection menu; charging, launching, and throwing mechanics have been removed (this direct-selection behavior is specific to 1.2.0 for Minecraft 1.21.1 / NeoForge and does not automatically apply to other historical versions).
+
 ## Requirements
 
 - [FTB Essentials](https://www.curseforge.com/minecraft/mc-mods/ftb-essentials)
@@ -21,6 +23,3 @@ Paper Plane lets players use paper planes to send FTB Essentials `/tpa` requests
 ![Receiving a teleport request](docs/images/request-received.png)
 
 ![Ender Paper Plane recipe](docs/images/ender-paper-plane-recipe.png)
-
-![Paper Plane in flight](docs/images/plane-in-flight.png)
-

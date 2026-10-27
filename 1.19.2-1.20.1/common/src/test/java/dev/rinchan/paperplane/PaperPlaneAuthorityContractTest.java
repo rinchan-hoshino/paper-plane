@@ -65,8 +65,6 @@ final class PaperPlaneAuthorityContractTest {
     @Test
     void bothVersionsKeepMouthPoseAndVelocityOrientedWorldRendering() throws Exception {
         String item = source("common/src/main/java/dev/rinchan/paperplane/item/PaperPlaneItem.java");
-        assertTrue(item.contains("UseAnim.TOOT_HORN"));
-        assertTrue(item.contains("PaperPlaneFlightModel.launchSpeed"));
 
         for (String version : new String[] {"1.19.2", "1.20.1"}) {
             String renderer = source("versions/" + version + "/src/main/java/dev/rinchan/paperplane/client/PaperPlaneEntityRenderer.java");

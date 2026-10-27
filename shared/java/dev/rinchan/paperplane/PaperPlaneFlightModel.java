@@ -2,10 +2,6 @@ package dev.rinchan.paperplane;
 
 /** Deterministic low-speed glider model expressed in blocks per tick. */
 public final class PaperPlaneFlightModel {
-    public static final int MIN_CHARGE_TICKS = 5;
-    public static final int MAX_CHARGE_TICKS = 40;
-    private static final double MIN_LAUNCH_SPEED = 0.65D;
-    private static final double MAX_LAUNCH_SPEED = 1.65D;
     private static final double STALL_SPEED = 0.32D;
     private static final double BASE_DRAG = 0.009D;
     private static final double SPEED_DRAG = 0.003D;
@@ -16,18 +12,7 @@ public final class PaperPlaneFlightModel {
     private PaperPlaneFlightModel() {
     }
 
-    public static boolean canLaunch(int chargeTicks) {
-        return chargeTicks >= MIN_CHARGE_TICKS;
-    }
 
-    public static double launchSpeed(int chargeTicks) {
-        if (!canLaunch(chargeTicks)) {
-            return 0.0D;
-        }
-        double fraction = Math.min(1.0D, (chargeTicks - MIN_CHARGE_TICKS) / (double) (MAX_CHARGE_TICKS - MIN_CHARGE_TICKS));
-        double eased = fraction * fraction * (3.0D - 2.0D * fraction);
-        return MIN_LAUNCH_SPEED + (MAX_LAUNCH_SPEED - MIN_LAUNCH_SPEED) * eased;
-    }
 
     public static Velocity step(Velocity velocity) {
         double horizontalSpeed = velocity.horizontalSpeed();
@@ -44,17 +29,6 @@ public final class PaperPlaneFlightModel {
         );
     }
 
-    public static double simulateFlatRange(double launchSpeed, double startHeight) {
-        Velocity velocity = new Velocity(launchSpeed, 0.0D, 0.0D);
-        double x = 0.0D;
-        double y = startHeight;
-        for (int tick = 0; tick < 600 && y > 0.0D; tick++) {
-            velocity = step(velocity);
-            x += velocity.x();
-            y += velocity.y();
-        }
-        return x;
-    }
 
     public record Velocity(double x, double y, double z) {
         public double horizontalSpeed() {

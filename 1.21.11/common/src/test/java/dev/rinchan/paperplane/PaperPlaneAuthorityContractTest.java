@@ -61,11 +61,9 @@ final class PaperPlaneAuthorityContractTest {
     }
 
     @Test
-    void chargingUsesMouthPoseAndWorldEntityIsNotCameraBillboarded() throws Exception {
-        String item = Files.readString(source("dev/rinchan/paperplane/item/PaperPlaneItem.java"));
+    void worldEntityHeadingAndHandTransformsRemainUnchanged() throws Exception {
         String renderer = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneEntityRenderer.java"));
         assertTrue(item.contains("ItemUseAnimation.TOOT_HORN"));
-        assertTrue(item.contains("PaperPlaneFlightModel.launchSpeed"));
         assertTrue(renderer.contains("plane.getYRot()"));
         assertFalse(renderer.contains("cameraOrientation"));
         String pose = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java"));

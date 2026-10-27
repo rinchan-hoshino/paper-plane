@@ -97,7 +97,11 @@ public final class PaperPlane {
     }
 
     public static boolean respondToTeleportRequest(ServerPlayer target, UUID requestId, boolean accept) {
-        if (!REQUESTS.isOwnedByTarget(requestId, target.getUUID())) return false;
+        var request = TPACommand.requests().get(requestId);
+        if (request == null || !request.target().getUuid().equals(target.getUUID())) return true;
+        // Validate the native request recipient before delegating to FTB.
+        // Falling back to a chat command after a repeat click fails on servers
+        // that expose TPA only through Paper Plane rather than public commands.
         if (accept) FTB_TPA.tpaccept(target, requestId.toString());
         else FTB_TPA.tpdeny(target, requestId.toString());
         return true;

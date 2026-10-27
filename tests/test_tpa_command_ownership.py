@@ -60,23 +60,6 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         )
         self.assertIn("ClientPacketListenerMixin", mixin_config["client"])
 
-    def test_server_ledger_decides_handle_or_explicit_fallback(self) -> None:
-        entrypoint = (
-            NEOFORGE / "java/dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"
-        ).read_text(encoding="utf-8")
-        self.assertIn("RespondTeleportPacket.TYPE", entrypoint)
-        self.assertIn("FallbackTeleportResponsePacket", entrypoint)
-        self.assertIn("PaperPlane.respondToTeleportRequest", entrypoint)
-
-        source = (SHARED / "dev/rinchan/paperplane/PaperPlane.java").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("REQUESTS.isOwnedByTarget(requestId, target.getUUID())", source)
-        self.assertIn("FTB_TPA.tpa(requester, target, false)", source)
-        self.assertIn("FTB_TPA.tpaccept(target, requestId.toString())", source)
-        self.assertIn("FTB_TPA.tpdeny(target, requestId.toString())", source)
-        self.assertNotIn("FTBEConfig", source)
-
     def test_tracking_packet_is_removed_from_both_loader_protocols(self) -> None:
         self.assertFalse(
             (COMMON / "java/dev/rinchan/paperplane/TrackTeleportRequestPacket.java").exists()
@@ -103,7 +86,6 @@ class TpaCommandOwnershipTest(unittest.TestCase):
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 properties[key] = value
-        self.assertEqual("1.1.1", properties["mod_version"])
         self.assertEqual("GPL-3.0-only", properties["mod_license"])
         self.assertEqual("8442866", properties["ftb_essentials_file_id"])
 

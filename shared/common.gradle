@@ -1,5 +1,6 @@
 subprojects {
     plugins.withType(JavaPlugin).configureEach {
+        tasks.withType(Jar).configureEach { from(rootProject.file('../LICENSE')) }
         sourceSets.main.java.srcDir rootProject.file('../shared/java')
         if (rootProject.findProperty('legacy_ftb_api') != 'true') {
             sourceSets.main.java.srcDir rootProject.file('../shared/modern')
