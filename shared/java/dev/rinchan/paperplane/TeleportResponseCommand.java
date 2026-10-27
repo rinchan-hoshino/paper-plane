@@ -27,7 +27,4 @@ public record TeleportResponseCommand(UUID requestId, boolean accept) {
         }
     }
 
-    public String command() {
-        return (accept ? ACCEPT_PREFIX : DENY_PREFIX) + requestId;
-    }
 }

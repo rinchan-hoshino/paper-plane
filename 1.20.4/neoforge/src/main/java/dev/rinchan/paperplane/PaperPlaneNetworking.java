@@ -13,10 +13,6 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
 public final class PaperPlaneNetworking {
-    public static void trackRequest(net.minecraft.server.level.ServerPlayer target, java.util.UUID requestId, boolean active) {
-        sendToPlayer(target, new dev.rinchan.paperplane.TrackTeleportRequestPacket(requestId, active));
-    }
-
     private PaperPlaneNetworking() {
     }
 
@@ -34,19 +30,17 @@ public final class PaperPlaneNetworking {
     }
 
     public static void register(IPayloadRegistrar registrar) {
-        IPayloadRegistrar versioned = registrar.versioned("1");
+        IPayloadRegistrar versioned = registrar.versioned("2");
         versioned.play(OpenTeleportScreenPacket.ID, OpenPayload::new,
             handlers -> handlers.client(PaperPlaneNetworking::handleOpen));
-        versioned.play(TrackTeleportRequestPacket.ID, TrackPayload::new,
-            handlers -> handlers.client(PaperPlaneNetworking::handleTrack));
         versioned.play(RequestTeleportPacket.ID, RequestPayload::new,
             handlers -> handlers.server(PaperPlaneNetworking::handleRequest));
         versioned.play(RespondTeleportPacket.ID, RespondPayload::new,
             handlers -> handlers.server(PaperPlaneNetworking::handleResponse));
     }
 
-    public static void sendToPlayer(ServerPlayer player, Object packet) {
-        PacketDistributor.PLAYER.with(player).send(toPayload(packet));
+    public static void sendToPlayer(ServerPlayer player, OpenTeleportScreenPacket packet) {
+        PacketDistributor.PLAYER.with(player).send(new OpenPayload(packet));
     }
 
     public static void sendTeleportRequest(UUID sessionId, UUID targetId) {
@@ -57,22 +51,8 @@ public final class PaperPlaneNetworking {
         PacketDistributor.SERVER.noArg().send(new RespondPayload(new RespondTeleportPacket(requestId, accept)));
     }
 
-    private static CustomPacketPayload toPayload(Object packet) {
-        if (packet instanceof OpenTeleportScreenPacket open) {
-            return new OpenPayload(open);
-        }
-        if (packet instanceof TrackTeleportRequestPacket track) {
-            return new TrackPayload(track);
-        }
-        throw new IllegalArgumentException("Unsupported Paper Plane clientbound packet: " + packet.getClass().getName());
-    }
-
     private static void handleOpen(OpenPayload payload, PlayPayloadContext context) {
         observeNetworkWork(context.workHandler().submitAsync(() -> PaperPlaneClient.open(payload.packet())), "open teleport screen");
-    }
-
-    private static void handleTrack(TrackPayload payload, PlayPayloadContext context) {
-        observeNetworkWork(context.workHandler().submitAsync(() -> PaperPlaneClient.track(payload.packet())), "track teleport request");
     }
 
     private static void handleRequest(RequestPayload payload, PlayPayloadContext context) {
@@ -116,22 +96,6 @@ public final class PaperPlaneNetworking {
         @Override
         public net.minecraft.resources.ResourceLocation id() {
             return OpenTeleportScreenPacket.ID;
-        }
-    }
-
-    private record TrackPayload(TrackTeleportRequestPacket packet) implements CustomPacketPayload {
-        private TrackPayload(FriendlyByteBuf buffer) {
-            this(TrackTeleportRequestPacket.decode(buffer));
-        }
-
-        @Override
-        public void write(FriendlyByteBuf buffer) {
-            packet.encode(buffer);
-        }
-
-        @Override
-        public net.minecraft.resources.ResourceLocation id() {
-            return TrackTeleportRequestPacket.ID;
         }
     }
 

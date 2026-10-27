@@ -53,13 +53,13 @@ class TeleportResponseDispatchTest {
       requests.put(request, liveRequest);
       var unrelated = mock(ServerPlayer.class);
       when(unrelated.getUUID()).thenReturn(UUID.fromString("00000000-0000-0000-0000-000000000003"));
-      assertTrue(PaperPlane.respondToTeleportRequest(unrelated, request, true));
+      assertDoesNotThrow(() -> PaperPlane.respondToTeleportRequest(unrelated, request, true));
       assertTrue(requests.containsKey(request), "A different recipient cannot consume the request");
       // With no live Paper Plane ledger entry, the native TPA owner still
       // decides whether the request is valid. Never emit a client fallback.
-      assertTrue(PaperPlane.respondToTeleportRequest(target, request, true));
-      assertTrue(PaperPlane.respondToTeleportRequest(target, request, true));
-      assertTrue(PaperPlane.respondToTeleportRequest(target, request, false));
+      assertDoesNotThrow(() -> PaperPlane.respondToTeleportRequest(target, request, true));
+      assertDoesNotThrow(() -> PaperPlane.respondToTeleportRequest(target, request, true));
+      assertDoesNotThrow(() -> PaperPlane.respondToTeleportRequest(target, request, false));
       assertEquals(1, nativeCommands.constructed().size());
       var nativeCommand = nativeCommands.constructed().getFirst();
       verify(nativeCommand).tpaccept(target, request.toString());

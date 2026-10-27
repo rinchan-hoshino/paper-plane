@@ -1,6 +1,5 @@
 package dev.rinchan.paperplane.fabric;
 
-import dev.rinchan.paperplane.FallbackTeleportResponsePacket;
 import dev.rinchan.paperplane.OpenTeleportScreenPacket;
 import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.client.PaperPlaneEntityRenderer;
@@ -14,7 +13,5 @@ public final class PaperPlaneFabricClient implements ClientModInitializer {
         EntityRendererRegistry.register(PaperPlaneRegistries.PAPER_PLANE_ENTITY.get(), PaperPlaneEntityRenderer::new);
         ClientPlayNetworking.registerGlobalReceiver(OpenTeleportScreenPacket.TYPE,
             (packet, context) -> context.client().execute(() -> PaperPlaneClient.openTeleportScreen(packet)));
-        ClientPlayNetworking.registerGlobalReceiver(FallbackTeleportResponsePacket.TYPE,
-            (packet, context) -> context.client().execute(() -> PaperPlaneClient.fallbackTeleportResponse(packet)));
     }
 }

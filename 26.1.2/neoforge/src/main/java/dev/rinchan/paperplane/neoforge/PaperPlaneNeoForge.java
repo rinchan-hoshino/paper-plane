@@ -4,7 +4,6 @@ import dev.rinchan.paperplane.OpenTeleportScreenPacket;
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.RequestTeleportPacket;
 import dev.rinchan.paperplane.RespondTeleportPacket;
-import dev.rinchan.paperplane.TrackTeleportRequestPacket;
 import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,11 +32,9 @@ public class PaperPlaneNeoForge {
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("2");
+        PayloadRegistrar registrar = event.registrar("3");
         registrar.playToClient(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC,
             (packet, context) -> enqueue(context, () -> PaperPlaneClient.openTeleportScreen(packet), "open teleport screen"));
-        registrar.playToClient(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC,
-            (packet, context) -> enqueue(context, () -> PaperPlaneClient.trackTeleportRequest(packet), "track teleport request"));
         registrar.playToServer(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC,
             (packet, context) -> enqueue(context, () -> {
                 if (context.player() instanceof ServerPlayer player) {

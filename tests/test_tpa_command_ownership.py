@@ -32,19 +32,12 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         self.assertIn("boolean accept", packet)
         self.assertIn('"respond_teleport"', packet)
 
-        fallback = (
-            COMMON / "java/dev/rinchan/paperplane/FallbackTeleportResponsePacket.java"
-        ).read_text(encoding="utf-8")
-        self.assertIn("UUID requestId", fallback)
-        self.assertIn("boolean accept", fallback)
-        self.assertIn('"fallback_teleport_response"', fallback)
-
         client = (
             COMMON / "java/dev/rinchan/paperplane/client/PaperPlaneClient.java"
         ).read_text(encoding="utf-8")
         self.assertIn("TeleportResponseCommand.parse(command)", client)
         self.assertIn("PaperPlaneNetworking.sendTeleportResponse", client)
-        self.assertIn("fallbackTeleportResponse", client)
+        self.assertNotIn("fallbackTeleportResponse", client)
         self.assertNotIn("TRACKED_REQUESTS", client)
         self.assertNotIn("TrackTeleportRequestPacket", client)
 
@@ -76,9 +69,9 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         for source in (neoforge, fabric, fabric_client):
             self.assertNotIn("TrackTeleportRequestPacket", source)
-        self.assertIn("FallbackTeleportResponsePacket", neoforge)
-        self.assertIn("FallbackTeleportResponsePacket", fabric)
-        self.assertIn("FallbackTeleportResponsePacket", fabric_client)
+        self.assertNotIn("FallbackTeleportResponsePacket", neoforge)
+        self.assertNotIn("FallbackTeleportResponsePacket", fabric)
+        self.assertNotIn("FallbackTeleportResponsePacket", fabric_client)
 
     def test_release_metadata_matches_current_source_license(self) -> None:
         properties = {}

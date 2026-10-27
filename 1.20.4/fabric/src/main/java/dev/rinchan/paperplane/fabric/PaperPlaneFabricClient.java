@@ -1,7 +1,6 @@
 package dev.rinchan.paperplane.fabric;
 
 import dev.rinchan.paperplane.OpenTeleportScreenPacket;
-import dev.rinchan.paperplane.TrackTeleportRequestPacket;
 import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.client.PaperPlaneEntityRenderer;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
@@ -16,10 +15,6 @@ public final class PaperPlaneFabricClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(OpenTeleportScreenPacket.ID, (client, handler, buffer, responseSender) -> {
             OpenTeleportScreenPacket packet = OpenTeleportScreenPacket.decode(buffer);
             client.execute(() -> PaperPlaneClient.open(packet));
-        });
-        ClientPlayNetworking.registerGlobalReceiver(TrackTeleportRequestPacket.ID, (client, handler, buffer, responseSender) -> {
-            TrackTeleportRequestPacket packet = TrackTeleportRequestPacket.decode(buffer);
-            client.execute(() -> PaperPlaneClient.track(packet));
         });
     }
 }

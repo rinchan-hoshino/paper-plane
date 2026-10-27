@@ -13,7 +13,6 @@ public final class PaperPlaneFabric implements ModInitializer {
         PayloadTypeRegistry.serverboundPlay().register(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(RespondTeleportPacket.TYPE, RespondTeleportPacket.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(TrackTeleportRequestPacket.TYPE, TrackTeleportRequestPacket.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(RequestTeleportPacket.TYPE, (packet, context) -> context.server().execute(() -> {
             try { PaperPlane.requestTeleport(context.player(), packet.sessionId(), packet.targetId()); }
             catch (Throwable failure) { PaperPlane.LOGGER.error("Failed to request teleport", failure); }

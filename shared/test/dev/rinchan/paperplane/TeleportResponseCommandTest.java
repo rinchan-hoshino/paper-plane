@@ -21,12 +21,6 @@ final class TeleportResponseCommandTest {
     }
 
     @Test
-    void fallbackCommandRoundTripsExactlyOnceThroughTheSameParser() {
-        TeleportResponseCommand response = new TeleportResponseCommand(REQUEST_ID, true);
-        assertEquals(response, TeleportResponseCommand.parse(response.command()).orElseThrow());
-    }
-
-    @Test
     void rejectsOtherCommandsAndMalformedRequestIds() {
         assertTrue(TeleportResponseCommand.parse("home").isEmpty());
         assertTrue(TeleportResponseCommand.parse("tpaccept not-a-uuid").isEmpty());

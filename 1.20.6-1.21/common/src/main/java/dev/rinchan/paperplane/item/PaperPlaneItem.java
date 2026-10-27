@@ -27,11 +27,4 @@ public class PaperPlaneItem extends Item {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
-
-
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return USE_DURATION;
-    }
-
-
 }

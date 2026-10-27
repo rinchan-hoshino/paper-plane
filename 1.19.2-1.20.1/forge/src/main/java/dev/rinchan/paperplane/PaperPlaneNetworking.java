@@ -15,7 +15,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PaperPlaneNetworking {
-    private static final String PROTOCOL = "1";
+    private static final String PROTOCOL = "2";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
         new ResourceLocation(PaperPlane.MOD_ID, "main"),
         () -> PROTOCOL,
@@ -32,12 +32,6 @@ public final class PaperPlaneNetworking {
             id++, OpenTeleportScreenPacket.class,
             OpenTeleportScreenPacket::encode, OpenTeleportScreenPacket::decode,
             PaperPlaneNetworking::handleOpenScreen,
-            Optional.of(NetworkDirection.PLAY_TO_CLIENT)
-        );
-        CHANNEL.registerMessage(
-            id++, TrackTeleportRequestPacket.class,
-            TrackTeleportRequestPacket::encode, TrackTeleportRequestPacket::decode,
-            PaperPlaneNetworking::handleTrackRequest,
             Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );
         CHANNEL.registerMessage(
@@ -77,12 +71,6 @@ public final class PaperPlaneNetworking {
     private static void handleOpenScreen(OpenTeleportScreenPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> PaperPlaneClient.openTeleportScreen(packet));
-        context.setPacketHandled(true);
-    }
-
-    private static void handleTrackRequest(TrackTeleportRequestPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> PaperPlaneClient.trackTeleportRequest(packet));
         context.setPacketHandled(true);
     }
 

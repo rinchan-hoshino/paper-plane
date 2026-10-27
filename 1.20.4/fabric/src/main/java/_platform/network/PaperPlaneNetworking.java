@@ -10,10 +10,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class PaperPlaneNetworking {
-    public static void trackRequest(net.minecraft.server.level.ServerPlayer target, java.util.UUID requestId, boolean active) {
-        sendToPlayer(target, new dev.rinchan.paperplane.TrackTeleportRequestPacket(requestId, active));
-    }
-
     private PaperPlaneNetworking() {
     }
 
@@ -30,18 +26,12 @@ public final class PaperPlaneNetworking {
         return new OpenTeleportScreenPacket(sessionId, players, planeKind == PlaneKind.ENDER);
     }
 
-    public static void sendToPlayer(ServerPlayer player, Object packet) {
+    public static void sendToPlayer(ServerPlayer player, OpenTeleportScreenPacket packet) {
         FriendlyByteBuf buffer = PacketByteBufs.create();
-        if (packet instanceof OpenTeleportScreenPacket open) {
-            open.encode(buffer);
-            ServerPlayNetworking.send(player, OpenTeleportScreenPacket.ID, buffer);
-        } else if (packet instanceof TrackTeleportRequestPacket track) {
-            track.encode(buffer);
-            ServerPlayNetworking.send(player, TrackTeleportRequestPacket.ID, buffer);
-        } else {
-            throw new IllegalArgumentException("Unsupported Paper Plane clientbound packet: " + packet.getClass().getName());
-        }
+        packet.encode(buffer);
+        ServerPlayNetworking.send(player, OpenTeleportScreenPacket.ID, buffer);
     }
+
 
     public static void sendTeleportRequest(UUID sessionId, UUID targetId) {
         PaperPlaneFabricClientNetwork.send(new RequestTeleportPacket(sessionId, targetId));

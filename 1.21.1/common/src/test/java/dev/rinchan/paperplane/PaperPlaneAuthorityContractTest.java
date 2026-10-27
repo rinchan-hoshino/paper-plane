@@ -31,9 +31,7 @@ final class PaperPlaneAuthorityContractTest {
         assertTrue(client.contains("TeleportResponseCommand.parse(command)"));
         assertFalse(client.contains("TRACKED_REQUESTS"));
         String owner = Files.readString(source("dev/rinchan/paperplane/PaperPlane.java"));
-        assertTrue(owner.indexOf("REQUESTS.isOwnedByTarget(requestId, target.getUUID())") < owner.indexOf("FTB_TPA.tpaccept(target"));
         String platform = Files.readString(source("dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"));
-        assertTrue(platform.contains("FallbackTeleportResponsePacket"));
     }
 
     @Test

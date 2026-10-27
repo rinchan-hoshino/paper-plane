@@ -9,10 +9,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public final class PaperPlaneNetworking {
-    public static void trackRequest(net.minecraft.server.level.ServerPlayer target, java.util.UUID requestId, boolean active) {
-        sendToPlayer(target, new dev.rinchan.paperplane.TrackTeleportRequestPacket(requestId, active));
-    }
-
     private PaperPlaneNetworking() {
     }
 

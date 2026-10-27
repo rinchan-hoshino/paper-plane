@@ -30,10 +30,6 @@ public final class PaperPlaneNetworking {
             OpenTeleportScreenPacket packet = OpenTeleportScreenPacket.decode(buffer);
             client.execute(() -> PaperPlaneClient.openTeleportScreen(packet));
         });
-        ClientPlayNetworking.registerGlobalReceiver(TrackTeleportRequestPacket.ID, (client, handler, buffer, responseSender) -> {
-            TrackTeleportRequestPacket packet = TrackTeleportRequestPacket.decode(buffer);
-            client.execute(() -> PaperPlaneClient.trackTeleportRequest(packet));
-        });
     }
 
     public static OpenTeleportScreenPacket playerListPacket(MinecraftServer server, UUID requester, UUID sessionId, PlaneKind planeKind) {
@@ -44,18 +40,12 @@ public final class PaperPlaneNetworking {
         return new OpenTeleportScreenPacket(sessionId, players, planeKind == PlaneKind.ENDER);
     }
 
-    public static void sendToPlayer(ServerPlayer player, Object payload) {
+    public static void sendToPlayer(ServerPlayer player, OpenTeleportScreenPacket packet) {
         FriendlyByteBuf buffer = PacketByteBufs.create();
-        if (payload instanceof OpenTeleportScreenPacket packet) {
-            packet.encode(buffer);
-            ServerPlayNetworking.send(player, OpenTeleportScreenPacket.ID, buffer);
-        } else if (payload instanceof TrackTeleportRequestPacket packet) {
-            packet.encode(buffer);
-            ServerPlayNetworking.send(player, TrackTeleportRequestPacket.ID, buffer);
-        } else {
-            throw new IllegalArgumentException("Unsupported Paper Plane client packet " + payload.getClass().getName());
-        }
+        packet.encode(buffer);
+        ServerPlayNetworking.send(player, OpenTeleportScreenPacket.ID, buffer);
     }
+
 
     public static void sendTeleportRequest(UUID sessionId, UUID targetId) {
         FriendlyByteBuf buffer = PacketByteBufs.create();

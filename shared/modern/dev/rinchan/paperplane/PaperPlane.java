@@ -93,18 +93,16 @@ public final class PaperPlane {
             LOGGER.error("Rejected duplicate Paper Plane pending state for requester {}", requester.getUUID());
             return;
         }
-        PaperPlaneNetworking.trackRequest(target, request.id(), true);
     }
 
-    public static boolean respondToTeleportRequest(ServerPlayer target, UUID requestId, boolean accept) {
+    public static void respondToTeleportRequest(ServerPlayer target, UUID requestId, boolean accept) {
         var request = TPACommand.requests().get(requestId);
-        if (request == null || !request.target().getUuid().equals(target.getUUID())) return true;
+        if (request == null || !request.target().getUuid().equals(target.getUUID())) return;
         // Validate the native request recipient before delegating to FTB.
         // Falling back to a chat command after a repeat click fails on servers
         // that expose TPA only through Paper Plane rather than public commands.
         if (accept) FTB_TPA.tpaccept(target, requestId.toString());
         else FTB_TPA.tpdeny(target, requestId.toString());
-        return true;
     }
 
     public static int acceptTeleportRequest(ServerPlayer target, String requestId, IntSupplier operation) {
@@ -141,11 +139,11 @@ public final class PaperPlane {
         try {
             int result = operation.getAsInt();
             if (result > 0) {
-                clearRequest(PaperPlanePlatform.server(target), id);
+                clearRequest(id);
             } else {
                 refund(requester, payment);
                 if (!TPACommand.requests().containsKey(id)) {
-                    clearRequest(PaperPlanePlatform.server(target), id);
+                    clearRequest(id);
                 }
             }
             return result;
@@ -159,7 +157,7 @@ public final class PaperPlane {
         if (result > 0) {
             REQUESTS.byRequest(requestId)
                 .filter(pending -> pending.targetId().equals(target.getUUID()))
-                .ifPresent(pending -> clearRequest(PaperPlanePlatform.server(target), requestId));
+                .ifPresent(pending -> clearRequest(requestId));
         }
     }
 
@@ -167,25 +165,17 @@ public final class PaperPlane {
         SELECTIONS.remove(player.getUUID());
         for (TeleportRequestLedger.Pending pending : REQUESTS.removePlayer(player.getUUID())) {
             TPACommand.requests().remove(pending.requestId());
-            notifyTracking(PaperPlanePlatform.server(player), pending, false);
         }
     }
 
     private static void reconcilePending(ServerPlayer player) {
         REQUESTS.pendingFor(player.getUUID())
             .filter(pending -> !TPACommand.requests().containsKey(pending.requestId()))
-            .ifPresent(pending -> clearRequest(PaperPlanePlatform.server(player), pending.requestId()));
+            .ifPresent(pending -> clearRequest(pending.requestId()));
     }
 
-    private static void clearRequest(net.minecraft.server.MinecraftServer server, UUID requestId) {
-        REQUESTS.remove(requestId).ifPresent(pending -> notifyTracking(server, pending, false));
-    }
-
-    private static void notifyTracking(net.minecraft.server.MinecraftServer server, TeleportRequestLedger.Pending pending, boolean active) {
-        ServerPlayer target = server.getPlayerList().getPlayer(pending.targetId());
-        if (target != null) {
-            PaperPlaneNetworking.trackRequest(target, pending.requestId(), active);
-        }
+    private static void clearRequest(UUID requestId) {
+        REQUESTS.remove(requestId);
     }
 
     private static TPARequest findNewFtbRequest(ServerPlayer requester, ServerPlayer target, Set<UUID> before) {

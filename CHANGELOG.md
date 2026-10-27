@@ -1,9 +1,10 @@
-## Paper Plane 1.2.0 (Minecraft 1.21.1 / NeoForge)
+## Paper Plane 1.2.0
 
 ### Changes & Improvements
 - **Direct player selection**: Right-clicking or sneak-right-clicking with any paper plane now directly opens the player selection list. Charging, launching, and throw consumption have been removed.
-- **Teleport accept handling**: The server teleport acceptance boundary now verifies that the active FTB Essentials request's target UUID matches the accepting player before delegating processing to FTB Essentials. Rapid clicks or expired requests terminate cleanly instead of falling back to executing the disabled `/tpaccept` command. Valid requests are forwarded directly to FTB Essentials, while target validation and payment handling continue through the native pipeline.
+- **Teleport accept handling**: The server teleport acceptance boundary now verifies that the active FTB Essentials request's target UUID matches the accepting player before delegating processing directly to FTB Essentials, preserving native target validation and payment handling. The deprecated fallback chat command execution path has been removed, and rapid clicks or expired requests terminate cleanly.
 - **Compatibility & behavior**: Retains the unexpired session reuse fix from 1.1.2 when reopening player selection with the same paper plane type (preserving the original 30-second window). Existing paper plane entity types remain registered so worlds with existing in-flight entities can still load. Teleport payment mechanics upon acceptance (consuming standard/wet planes and preserving reusable Ender Paper Planes) remain unchanged.
+* **Important:** Both client and server must be updated to 1.2.0 due to network protocol changes.
 
 # 1.1.2 — Minecraft 1.21.1 NeoForge
 

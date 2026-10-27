@@ -17,13 +17,12 @@ final class PaperPlaneAuthorityContractTest {
     }
 
     @Test
-    void clientCannotDeclarePlaneKindOrAnswerUntrackedCommands() throws Exception {
+    void requestPacketsKeepPlaneSelectionOnTheServer() throws Exception {
         String requestPacket = source("common/src/main/java/dev/rinchan/paperplane/RequestTeleportPacket.java");
         String client = source("common/src/main/java/dev/rinchan/paperplane/client/PaperPlaneClient.java");
         String clickMixin = source("common/src/main/java/dev/rinchan/paperplane/mixin/ScreenMixin.java");
         assertFalse(requestPacket.contains("boolean enderPlane"));
         assertTrue(requestPacket.contains("UUID sessionId"));
-        assertTrue(client.contains("TRACKED_REQUESTS.contains(requestId)"));
         assertTrue(clickMixin.contains("handleComponentClicked"));
         assertTrue(clickMixin.contains("PaperPlaneClient.handleTeleportResponseCommand"));
         assertFalse(Files.exists(ROOT.resolve("common/src/main/java/dev/rinchan/paperplane/mixin/ClientPacketListenerMixin.java")));

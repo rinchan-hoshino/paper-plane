@@ -27,12 +27,11 @@ final class PaperPlaneAuthorityContractTest {
     }
 
     @Test
-    void clientCannotDeclarePlaneKindOrAnswerUntrackedCommands() throws Exception {
+    void requestPacketsKeepPlaneSelectionOnTheServer() throws Exception {
         String requestPacket = Files.readString(source("dev/rinchan/paperplane/RequestTeleportPacket.java"));
         String client = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneClient.java"));
         assertFalse(requestPacket.contains("boolean enderPlane"));
         assertTrue(requestPacket.contains("UUID sessionId"));
-        assertTrue(client.contains("TRACKED_REQUESTS.contains(id)"));
     }
 
     @Test
@@ -63,7 +62,6 @@ final class PaperPlaneAuthorityContractTest {
     @Test
     void worldEntityHeadingAndHandTransformsRemainUnchanged() throws Exception {
         String renderer = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneEntityRenderer.java"));
-        assertTrue(item.contains("ItemUseAnimation.TOOT_HORN"));
         assertTrue(renderer.contains("plane.getYRot()"));
         assertFalse(renderer.contains("cameraOrientation"));
         String pose = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java"));

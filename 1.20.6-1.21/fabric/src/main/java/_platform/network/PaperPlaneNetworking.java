@@ -9,10 +9,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class PaperPlaneNetworking {
-    public static void trackRequest(net.minecraft.server.level.ServerPlayer target, java.util.UUID requestId, boolean active) {
-        sendToPlayer(target, new dev.rinchan.paperplane.TrackTeleportRequestPacket(requestId, active));
-    }
-
     private PaperPlaneNetworking() {}
 
     public static OpenTeleportScreenPacket playerListPacket(MinecraftServer server, UUID requester, UUID sessionId, PlaneKind planeKind) {

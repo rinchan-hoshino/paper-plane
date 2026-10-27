@@ -40,6 +40,10 @@ subprojects {
     version = rootProject.mod_version
 
     repositories {
+        exclusiveContent {
+            forRepository { maven { url = 'https://libraries.minecraft.net' } }
+            filter { includeGroup 'com.mojang' }
+        }
         mavenCentral()
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = 'https://maven.minecraftforge.net/' }

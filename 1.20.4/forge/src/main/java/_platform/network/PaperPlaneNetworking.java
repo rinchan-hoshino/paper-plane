@@ -12,13 +12,9 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 
 public final class PaperPlaneNetworking {
-    public static void trackRequest(net.minecraft.server.level.ServerPlayer target, java.util.UUID requestId, boolean active) {
-        sendToPlayer(target, new dev.rinchan.paperplane.TrackTeleportRequestPacket(requestId, active));
-    }
-
     private static final SimpleChannel CHANNEL = ChannelBuilder
         .named(new ResourceLocation(PaperPlane.MOD_ID, "main"))
-        .networkProtocolVersion(1)
+        .networkProtocolVersion(2)
         .simpleChannel();
     private static boolean registered;
 
@@ -48,11 +44,6 @@ public final class PaperPlaneNetworking {
             .decoder(OpenTeleportScreenPacket::decode)
             .consumerMainThread((packet, context) -> PaperPlaneClient.open(packet))
             .add();
-        CHANNEL.messageBuilder(TrackTeleportRequestPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(TrackTeleportRequestPacket::encode)
-            .decoder(TrackTeleportRequestPacket::decode)
-            .consumerMainThread((packet, context) -> PaperPlaneClient.track(packet))
-            .add();
         CHANNEL.messageBuilder(RequestTeleportPacket.class, 2, NetworkDirection.PLAY_TO_SERVER)
             .encoder(RequestTeleportPacket::encode)
             .decoder(RequestTeleportPacket::decode)
@@ -75,10 +66,7 @@ public final class PaperPlaneNetworking {
             .add();
     }
 
-    public static void sendToPlayer(ServerPlayer player, Object packet) {
-        if (!(packet instanceof OpenTeleportScreenPacket) && !(packet instanceof TrackTeleportRequestPacket)) {
-            throw new IllegalArgumentException("Unsupported Paper Plane clientbound packet: " + packet.getClass().getName());
-        }
+    public static void sendToPlayer(ServerPlayer player, OpenTeleportScreenPacket packet) {
         CHANNEL.send(packet, PacketDistributor.PLAYER.with(player));
     }
 
