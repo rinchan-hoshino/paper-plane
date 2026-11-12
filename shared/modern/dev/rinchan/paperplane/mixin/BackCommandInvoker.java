@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
+// Target value = TeleportingCommands.class, remap = false: Invoker of the teleport command entry.
 @Mixin(value = TeleportingCommands.class, remap = false)
 public interface BackCommandInvoker {
     @Invoker("back")

@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Target ItemEntity.class: Inject of tick at TAIL.
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin {
     @Inject(method = "tick", at = @At("TAIL"))

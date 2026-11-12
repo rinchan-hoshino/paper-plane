@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 
+// Target value = WarmupCooldownTeleporter.class, remap = false: WrapMethod of teleportNow.
 @Mixin(value = WarmupCooldownTeleporter.class, remap = false)
 public class NativeTeleportMixin {
     @WrapMethod(method = "teleportNow")

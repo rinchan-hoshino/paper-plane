@@ -38,16 +38,18 @@ Paper Plane lets players use paper planes to send FTB Essentials `/tpa` requests
 #### FTB Essentials Integration
 * Teleport warmups, cooldowns, dimension restrictions, and position history remain entirely governed by native FTB Essentials configurations.
 
-### Paper Plane Configuration (`config/paper_plane.toml`)
+## Configuration
 
-Paper Plane server settings are loaded at startup. Restart the server after editing:
+`config/paper_plane.toml` is read at server start; restart the server after editing.
 
-- `enableTpa = true` (Default: `true`): Toggles TPA Paper Plane and Ender TPA Paper Plane abilities.
-- `enableBack = true` (Default: `true`): Toggles Back Paper Plane and Ender Back Paper Plane abilities.
+| Key | Default | Effect |
+|---|---|---|
+| `enableTpa` | `true` | Enables TPA Paper Plane and Ender TPA Paper Plane. |
+| `enableBack` | `true` | Enables Back Paper Plane and Ender Back Paper Plane. |
 
-These switches control item functionality independently of whether public `/tpa` or `/back` commands are enabled or registered in FTB Essentials.
+These switches control the items independently of whether public `/tpa` or `/back` commands are registered in FTB Essentials.
 
-### FTB Essentials Teleport Settings
+## FTB Essentials Teleport Settings
 
 Paper Plane defines no second cooldown or warmup. All cooldown, warmup, permission override, dimension restriction, and teleport history policies remain native to FTB Essentials.
 

@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Target value = WarmupCooldownTeleporter.class, remap = false: Inject of tickWarmups at RETURN; Inject of cancelWarmup at RETURN.
 @Mixin(value = WarmupCooldownTeleporter.class, remap = false)
 public class NativeWarmupMixin {
     @Shadow @Final private static Map<UUID, ?> WARMUPS;

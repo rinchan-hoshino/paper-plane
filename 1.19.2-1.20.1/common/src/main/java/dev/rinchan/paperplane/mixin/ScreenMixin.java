@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Target Screen.class: Inject of handleComponentClicked at HEAD.
 @Mixin(Screen.class)
 public abstract class ScreenMixin {
     @Inject(method = "handleComponentClicked", at = @At("HEAD"), cancellable = true)

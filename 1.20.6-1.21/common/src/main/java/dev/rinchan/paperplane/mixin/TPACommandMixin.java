@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Target value = TPACommand.class, remap = false: WrapMethod of tpaccept; Inject of tpdeny at RETURN.
 @Mixin(value = TPACommand.class, remap = false)
 public class TPACommandMixin {
     @WrapMethod(method = "tpaccept")
