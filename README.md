@@ -9,7 +9,6 @@ Paper Plane lets players use paper planes to send FTB Essentials `/tpa` requests
 - [FTB Essentials](https://www.curseforge.com/minecraft/mc-mods/ftb-essentials)
 - Minecraft 1.21.1 (Fabric and NeoForge): Requires FTB Essentials 2101.1.10 or newer within the 2101 series.
 - [FTB Library](https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge)
-- [RinLib](https://modrinth.com/mod/rinlib)
 
 ## Screenshots
 

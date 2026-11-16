@@ -27,8 +27,7 @@
     "java": ">=17",
     "architectury": ">=11.1.17",
     "ftblibrary": ">=2004.2.0 <2005",
-    "ftbessentials": ">=2004.1.0 <2005",
-    "rinlib": ">=1.0.2"
+    "ftbessentials": ">=2004.1.0 <2005"
   },
   "icon": "icon.png"
 }

@@ -43,10 +43,3 @@ mandatory = true
 versionRange = "${ftb_essentials_version_range}"
 ordering = "AFTER"
 side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId="rinlib"
-mandatory=true
-versionRange="[0.2.0,)"
-ordering="NONE"
-side="BOTH"

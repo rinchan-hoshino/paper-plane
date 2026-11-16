@@ -95,6 +95,5 @@ tasks.named('jar', Jar).configure {
 
 tasks.named('build').configure { dependsOn tasks.named('jarJar') }
 
-dependencies { implementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.targetMinecraft}-forge" }
 
 dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }

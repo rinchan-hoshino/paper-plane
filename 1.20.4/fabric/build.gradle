@@ -66,6 +66,5 @@ publishing {
     }
 }
 
-dependencies { modImplementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.minecraft_version}-fabric" }
 
 dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }

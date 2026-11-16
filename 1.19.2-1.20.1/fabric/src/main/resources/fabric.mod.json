@@ -26,8 +26,7 @@
     "fabric-api": "*",
     "architectury": "*",
     "ftblibrary": "${ftb_library_range}",
-    "ftbessentials": "${ftb_essentials_range}",
-    "rinlib": ">=0.2.0"
+    "ftbessentials": "${ftb_essentials_range}"
   },
   "icon": "icon.png"
 }

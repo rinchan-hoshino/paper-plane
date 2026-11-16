@@ -62,6 +62,5 @@ publishing {
     }
 }
 
-dependencies { implementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.minecraft_version}-neoforge" }
 
 dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }

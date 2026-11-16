@@ -39,10 +39,3 @@ type = "required"
 versionRange = "${ftb_essentials_version_range}"
 ordering = "AFTER"
 side = "BOTH"
-
-[[dependencies.${mod_id}]]
-modId="rinlib"
-type="required"
-versionRange="[1.0.2,)"
-ordering="NONE"
-side="BOTH"

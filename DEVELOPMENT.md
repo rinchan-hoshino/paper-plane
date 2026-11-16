@@ -11,6 +11,5 @@ python3 scripts/build.py --loader fabric        # Fabric across every supported 
 
 `matrix.json` is the supported-version list. Each profile keeps its loader/build API differences; `shared/java` contains version-independent gameplay and selection sessions. `shared/modern` contains the modern FTB teleport/payment service and request ledger. Minecraft accessors stay in each profile's small `PaperPlanePlatform`. The 1.19.2/1.20.1 profile retains its adapter for the older FTB API and string request IDs.
 
-RinLib is a required dependency in every profile, pulled from Modrinth: the two oldest Minecraft targets use the RinLib 0.2.0 line, newer targets use 1.0.2 (`rinlib_version` in each profile's `gradle.properties`).
 
 Do not replace real client/server verification with source-text checks or compilation alone. Exercise request acceptance, denial and consumption with `/tpa` disabled, and verify the packaged jars in an isolated game instance.

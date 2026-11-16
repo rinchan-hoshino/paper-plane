@@ -100,6 +100,5 @@ tasks.named('jar', Jar) {
     }
 }
 
-dependencies { implementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.versionProfile.minecraft_version}-neoforge" }
 
 dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }

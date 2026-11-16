@@ -57,6 +57,5 @@ processResources {
     }
 }
 
-dependencies { modImplementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.targetMinecraft}-fabric" }
 
 dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }

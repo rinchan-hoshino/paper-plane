@@ -71,7 +71,6 @@ tasks.named('build') {
     dependsOn tasks.named('remapJar')
 }
 
-dependencies { modImplementation "maven.modrinth:rinlib:${rootProject.rinlib_version}+${rootProject.versionProfile.minecraft_version}-fabric" }
 
 dependencies { testRuntimeOnly 'org.junit.platform:junit-platform-launcher' }
 
