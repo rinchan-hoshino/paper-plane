@@ -1,17 +1,85 @@
 subprojects {
     plugins.withType(JavaPlugin).configureEach {
+        def profile = rootProject.projectDir.name
         tasks.withType(Jar).configureEach { from(rootProject.file('../LICENSE')) }
         dependencies {
             implementation 'com.electronwill.night-config:toml:3.8.3'
         }
         sourceSets.main.java.srcDir rootProject.file('../shared/java')
+        sourceSets.main.resources.srcDir rootProject.file('../shared/resources')
         if (rootProject.findProperty('legacy_ftb_api') != 'true') {
             sourceSets.main.java.srcDir rootProject.file('../shared/modern')
         }
-        def nativeApi = rootProject.projectDir.name == '1.21.1' ? 'api' :
-            (rootProject.projectDir.name in ['1.21.11', '26.1.2'] ? 'position' : 'function')
+        def nativeApi = profile == '1.21.1' ? 'api' :
+            (profile in ['1.21.11', '26.1.2'] ? 'position' : 'function')
         sourceSets.main.java.srcDir rootProject.file("../shared/native-${nativeApi}")
+
+        if (profile in ['1.19.2-1.20.1', '1.20.4']) {
+            sourceSets.main.java.srcDir rootProject.file('../shared/java-1.19.2-1.20.4')
+        }
+        if (profile in ['1.20.4', '1.20.6-1.21', '1.21.1', '1.21.11', '26.1.2']) {
+            sourceSets.main.java.srcDir rootProject.file('../shared/java-1.20.4-plus')
+        }
+        if (profile in ['1.20.4', '1.20.6-1.21', '1.21.1']) {
+            sourceSets.main.java.srcDir rootProject.file('../shared/java-1.20.4-1.21.1')
+        }
+        if (profile in ['1.20.6-1.21', '1.21.1', '1.21.11', '26.1.2']) {
+            sourceSets.main.java.srcDir rootProject.file('../shared/java-1.20.6-plus')
+            sourceSets.main.resources.srcDir rootProject.file('../shared/resources-modern')
+        }
+        if (profile in ['1.20.6-1.21', '1.21.1']) {
+            sourceSets.main.java.srcDir rootProject.file('../shared/java-1.20.6-1.21.1')
+        }
+        if (profile in ['1.21.11', '26.1.2']) {
+            sourceSets.main.java.srcDir rootProject.file('../shared/java-1.21.11-plus')
+        }
+
+        if (project.name == 'fabric') {
+            if (profile in ['1.20.6-1.21', '1.21.1', '1.21.11', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/fabric-1.20.6-plus')
+            }
+            if (profile in ['1.20.6-1.21', '1.21.11', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/fabric-no-1.21.1')
+            }
+            if (profile in ['1.20.6-1.21', '1.21.1']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/fabric-1.20.6-1.21.1')
+            }
+            if (profile in ['1.20.6-1.21', '1.21.11']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/fabric-1.20.6-1.21.11')
+            }
+            if (profile in ['1.20.6-1.21', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/fabric-1.20.6-26.1.2')
+            }
+            if (profile in ['1.21.11', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/fabric-1.21.11-plus')
+            }
+        }
+
+        if (project.name == 'neoforge') {
+            if (profile in ['1.20.6-1.21', '1.21.1', '1.21.11', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/neoforge-1.20.6-plus')
+            }
+            if (profile in ['1.20.6-1.21', '1.21.11', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/neoforge-no-1.21.1')
+                tasks.withType(ProcessResources).matching { it.name == 'generateModMetadata' }.configureEach {
+                    from rootProject.file('../shared/neoforge-templates-modern')
+                }
+            }
+            if (profile in ['1.20.6-1.21', '1.21.1']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/neoforge-1.20.6-1.21.1')
+            }
+            if (profile in ['1.21.11', '26.1.2']) {
+                sourceSets.main.java.srcDir rootProject.file('../shared/neoforge-1.21.11-plus')
+            }
+        }
+
         sourceSets.test.java.srcDir rootProject.file('../shared/test')
+        if (profile in ['1.20.4', '1.20.6-1.21', '1.21.11', '26.1.2']) {
+            sourceSets.test.java.srcDir rootProject.file('../shared/test-ledger-modern')
+        }
+        if (profile in ['1.20.6-1.21', '1.21.11', '26.1.2']) {
+            sourceSets.test.java.srcDir rootProject.file('../shared/test-authority-modern')
+        }
     }
 
     configurations.matching { it.name == 'include' }.configureEach {

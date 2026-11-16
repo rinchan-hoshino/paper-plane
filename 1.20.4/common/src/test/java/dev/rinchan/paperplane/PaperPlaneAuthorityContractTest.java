@@ -9,21 +9,32 @@ import org.junit.jupiter.api.Test;
 
 final class PaperPlaneAuthorityContractTest {
     private static Path source(String relative) {
-        for (String shared : new String[]{"../shared/modern", "../../shared/modern", "../shared/java", "../../shared/java"}) {
-            Path candidate = Path.of(shared).resolve(relative);
+        for (String local : new String[]{"common/src/main/java", "../common/src/main/java", "neoforge/src/main/java", "../neoforge/src/main/java"}) {
+            Path candidate = Path.of(local).resolve(relative);
             if (Files.isRegularFile(candidate)) return candidate;
         }
-        for (String loaderSource : new String[]{"neoforge/src/main/java", "../neoforge/src/main/java"}) {
-            Path candidate = Path.of(loaderSource).resolve(relative);
-            if (Files.isRegularFile(candidate)) return candidate;
+        for (String sharedDir : new String[]{
+            "shared/modern", "shared/java", "shared/java-1.20.4-plus",
+            "shared/java-1.19.2-1.20.4", "shared/java-1.20.4-1.21.1"
+        }) {
+            for (String prefix : new String[]{"../", "../../"}) {
+                Path candidate = Path.of(prefix + sharedDir).resolve(relative);
+                if (Files.isRegularFile(candidate)) return candidate;
+            }
         }
-        Path direct = Path.of("common/src/main/java").resolve(relative);
-        return Files.isRegularFile(direct) ? direct : Path.of("../common/src/main/java").resolve(relative).normalize();
+        return Path.of("../common/src/main/java").resolve(relative).normalize();
     }
 
     private static Path resource(String relative) {
-        Path direct = Path.of("common/src/main/resources").resolve(relative);
-        return Files.isRegularFile(direct) ? direct : Path.of("../common/src/main/resources").resolve(relative).normalize();
+        for (String local : new String[]{"common/src/main/resources", "../common/src/main/resources"}) {
+            Path candidate = Path.of(local).resolve(relative);
+            if (Files.isRegularFile(candidate)) return candidate;
+        }
+        for (String prefix : new String[]{"../", "../../"}) {
+            Path candidate = Path.of(prefix + "shared/resources").resolve(relative);
+            if (Files.isRegularFile(candidate)) return candidate;
+        }
+        return Path.of("../common/src/main/resources").resolve(relative).normalize();
     }
 
     @Test

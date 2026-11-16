@@ -42,14 +42,14 @@ class TpaCommandOwnershipTest(unittest.TestCase):
         self.assertNotIn("TrackTeleportRequestPacket", client)
 
         mixin = (
-            COMMON / "java/dev/rinchan/paperplane/mixin/ClientPacketListenerMixin.java"
+            REPOSITORY / "shared/java-1.20.4-1.21.1/dev/rinchan/paperplane/mixin/ClientPacketListenerMixin.java"
         ).read_text(encoding="utf-8")
         self.assertIn('method = "sendUnsignedCommand"', mixin)
         self.assertIn("PaperPlaneClient.handleTeleportResponseCommand", mixin)
         self.assertIn("cancellable = true", mixin)
 
         mixin_config = json.loads(
-            (COMMON / "resources/paper_plane.mixins.json").read_text(encoding="utf-8")
+            (REPOSITORY / "shared/resources-modern/paper_plane.mixins.json").read_text(encoding="utf-8")
         )
         self.assertIn("ClientPacketListenerMixin", mixin_config["client"])
 

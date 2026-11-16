@@ -13,7 +13,21 @@ final class PaperPlaneAuthorityContractTest {
         : Path.of("..").normalize();
 
     private static String source(String relative) throws Exception {
-        return Files.readString(ROOT.resolve(relative));
+        Path direct = ROOT.resolve(relative);
+        if (Files.isRegularFile(direct)) {
+            return Files.readString(direct);
+        }
+        String javaRel = relative.replaceFirst("^common/src/main/java/", "");
+        Path shared = ROOT.resolve("../shared/java-1.19.2-1.20.4").resolve(javaRel).normalize();
+        if (Files.isRegularFile(shared)) {
+            return Files.readString(shared);
+        }
+        String resRel = relative.replaceFirst("^common/src/main/resources/", "");
+        Path sharedRes = ROOT.resolve("../shared/resources").resolve(resRel).normalize();
+        if (Files.isRegularFile(sharedRes)) {
+            return Files.readString(sharedRes);
+        }
+        return Files.readString(direct);
     }
 
     @Test
