@@ -81,7 +81,6 @@ public final class TeleportPlayerScreen extends BaseScreen {
     @Override
     public void alignWidgets() {
         setPos((getScreen().getGuiScaledWidth() - width) / 2, (getScreen().getGuiScaledHeight() - height) / 2);
-        updateScrollMax();
     }
 
     @Override
@@ -100,13 +99,6 @@ public final class TeleportPlayerScreen extends BaseScreen {
         if (listPanel != null) {
             listPanel.setScrollY(0);
             listPanel.refreshWidgets();
-            updateScrollMax();
-        }
-    }
-
-    private void updateScrollMax() {
-        if (scrollBar != null && listPanel != null) {
-            scrollBar.setMaxValue(listPanel.getContentHeight());
         }
     }
 
@@ -153,7 +145,6 @@ public final class TeleportPlayerScreen extends BaseScreen {
 
         @Override
         public void alignWidgets() {
-            updateScrollMax();
         }
 
         @Override

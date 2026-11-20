@@ -2,6 +2,11 @@
 
 All notable changes to Paper Plane are documented in this file.
 
+## [2.0.1] - 2026-11-20
+
+### Fixed
+- Fixed a crash (`UnsupportedOperationException: attempt to set max value of panel scrollbar`) when opening `TeleportPlayerScreen` by letting FTB Library's `PanelScrollBar` calculate its scroll range automatically from `PlayerListPanel`.
+
 ## [2.0.0] - 2026-11-20
 
 ### Added
