@@ -40,6 +40,8 @@ import org.junit.jupiter.api.Test;
 final class ArchitectureContractTest {
     private static final List<String> FORBIDDEN_SERVER_CLIENT_PREFIXES = List.of(
         "net/minecraft/client/",
+        "net/neoforged/neoforge/client/",
+        "net/minecraftforge/client/",
         "dev/ftb/mods/ftblibrary/ui/",
         "dev/ftb/mods/ftblibrary/icon/",
         "com/mojang/blaze3d/",

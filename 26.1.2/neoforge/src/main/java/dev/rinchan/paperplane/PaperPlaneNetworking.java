@@ -1,12 +1,12 @@
 package dev.rinchan.paperplane;
 
+import dev.rinchan.paperplane.client.PaperPlaneClientNetwork;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public final class PaperPlaneNetworking {
     private PaperPlaneNetworking() {
@@ -25,10 +25,10 @@ public final class PaperPlaneNetworking {
     }
 
     public static void sendTeleportRequest(UUID sessionId, UUID targetId) {
-        ClientPacketDistributor.sendToServer(new RequestTeleportPacket(sessionId, targetId));
+        PaperPlaneClientNetwork.sendToServer(new RequestTeleportPacket(sessionId, targetId));
     }
 
     public static void sendTeleportResponse(UUID requestId, boolean accept) {
-        ClientPacketDistributor.sendToServer(new RespondTeleportPacket(requestId, accept));
+        PaperPlaneClientNetwork.sendToServer(new RespondTeleportPacket(requestId, accept));
     }
 }
