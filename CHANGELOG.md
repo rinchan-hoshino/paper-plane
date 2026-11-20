@@ -2,6 +2,12 @@
 
 All notable changes to Paper Plane are documented in this file.
 
+## [2.0.2] - 2026-11-20
+
+### Fixed
+- Fixed `TeleportPlayerScreen.updateFilter()` failing to reset `scrollBar.setValue(0)` when the search filter changes, preventing a frozen scrollbar after scrolling down and narrowing/clearing the filter.
+- Validated across the 6-target build matrix, property-based invariant tests, packaged-JAR architecture contracts, `e2eClientTest`, and real Minecraft 1.21.1 NeoForge `runE2eGameTestServer`.
+
 ## [2.0.1] - 2026-11-20
 
 ### Fixed
