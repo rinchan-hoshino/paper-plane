@@ -23,5 +23,26 @@ subprojects {
                 }
             }
         }
+
+        afterEvaluate {
+            def findArchiveTask = { String name ->
+                def t = tasks.findByName(name)
+                return (t instanceof AbstractArchiveTask) ? t : null
+            }
+            def deliverableTask = findArchiveTask('remapJar')
+                ?: findArchiveTask('jarJar')
+                ?: findArchiveTask('jar')
+            if (deliverableTask != null && tasks.findByName('test') != null) {
+                def sourceDirsArg = sourceSets.main.java.srcDirs
+                    .collect { it.absolutePath }
+                    .join(File.pathSeparator)
+                def deliverablePath = deliverableTask.archiveFile.get().asFile.absolutePath
+                tasks.named('test', Test).configure {
+                    dependsOn(deliverableTask)
+                    systemProperty 'paperplane.jar', deliverablePath
+                    systemProperty 'paperplane.sourceDirs', sourceDirsArg
+                }
+            }
+        }
     }
 }

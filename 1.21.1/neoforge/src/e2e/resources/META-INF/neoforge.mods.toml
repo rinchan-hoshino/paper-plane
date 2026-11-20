@@ -1,0 +1,37 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "GPL-3.0-only"
+
+[[mods]]
+modId = "paper_plane_e2e"
+version = "1.0.0"
+displayName = "Paper Plane Packaged-JAR E2E Harness"
+description = '''Black-box GameTest harness verifying the packaged paper_plane JAR with real FTB Library & FTB Essentials.'''
+
+[[dependencies.paper_plane_e2e]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.paper_plane_e2e]]
+modId = "paper_plane"
+type = "required"
+versionRange = "[2.0.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.paper_plane_e2e]]
+modId = "ftblibrary"
+type = "required"
+versionRange = "[2101.1.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.paper_plane_e2e]]
+modId = "ftbessentials"
+type = "required"
+versionRange = "[2101.1.0,)"
+ordering = "AFTER"
+side = "BOTH"

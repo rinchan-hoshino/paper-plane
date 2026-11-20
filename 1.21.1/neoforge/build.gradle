@@ -31,11 +31,22 @@ sourceSets.main.resources.srcDir tasks.register('generateModMetadata', ProcessRe
     into layout.buildDirectory.dir('generated/sources/modMetadata')
 }
 
+sourceSets {
+    e2e
+    e2eClient
+}
+
 neoForge {
     version = rootProject.neo_version
+    accessTransformers {
+        from(file('src/e2eClient/resources/META-INF/ftblibrary-at.cfg'))
+    }
     mods {
         "${rootProject.mod_id}" {
             sourceSet(sourceSets.main)
+        }
+        paper_plane_e2e {
+            sourceSet(sourceSets.e2e)
         }
     }
     runs {
@@ -43,6 +54,12 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
+        }
+        e2eGameTestServer {
+            type = 'gameTestServer'
+            gameDirectory = layout.buildDirectory.dir('e2e-run')
+            loadedMods = [neoForge.mods.paper_plane_e2e]
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'paper_plane_e2e'
         }
         configureEach {
             logLevel = org.slf4j.event.Level.INFO
@@ -61,12 +78,49 @@ dependencies {
     compileOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
     runtimeOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
+    runtimeOnly 'dev.architectury:architectury-neoforge:13.0.8'
 
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.mockito:mockito-core:5.20.0'
     testRuntimeOnly 'dev.architectury:architectury-neoforge:13.0.8'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sourceSets.e2e.compileClasspath += sourceSets.main.compileClasspath + files(tasks.named('jar'))
+sourceSets.e2e.runtimeClasspath += sourceSets.main.runtimeClasspath
+
+sourceSets.e2eClient.compileClasspath += (sourceSets.test.compileClasspath - sourceSets.main.output) + files(tasks.named('jar'))
+sourceSets.e2eClient.runtimeClasspath += (sourceSets.test.runtimeClasspath - sourceSets.main.output) + files(tasks.named('jar'))
+
+def prepareE2eMods = tasks.register('prepareE2eMods', Sync) {
+    dependsOn tasks.named('jar')
+    from tasks.named('jar')
+    into layout.buildDirectory.dir('e2e-run/mods')
+}
+
+tasks.matching { it.name == 'runE2eGameTestServer' }.configureEach {
+    dependsOn(prepareE2eMods)
+}
+
+def e2eClientTest = tasks.register('e2eClientTest', Test) {
+    description = 'Runs packaged-JAR black-box TeleportPlayerScreen E2E verification with real FTB Library.'
+    group = 'verification'
+    dependsOn tasks.named('jar')
+    testClassesDirs = sourceSets.e2eClient.output.classesDirs
+    classpath = sourceSets.e2eClient.runtimeClasspath
+    useJUnitPlatform()
+    forkEvery = 1
+}
+
+def verifyE2e = tasks.register('verifyE2e') {
+    description = 'Runs packaged-JAR NeoForge GameTest server E2E and black-box client screen E2E.'
+    group = 'verification'
+    dependsOn(e2eClientTest, 'runE2eGameTestServer')
+}
+
+tasks.named('check').configure {
+    dependsOn(verifyE2e)
 }
 
 tasks.named('test', Test).configure {

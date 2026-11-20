@@ -100,6 +100,9 @@ public final class TeleportPlayerScreen extends BaseScreen {
             listPanel.setScrollY(0);
             listPanel.refreshWidgets();
         }
+        if (scrollBar != null) {
+            scrollBar.setValue(0);
+        }
     }
 
     private void select(UUID targetId) {

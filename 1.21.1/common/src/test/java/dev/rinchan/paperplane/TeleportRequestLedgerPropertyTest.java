@@ -24,8 +24,190 @@ final class TeleportRequestLedgerPropertyTest {
 
     @Test
     void generatedRequestSequencesPreserveBothIndexesAndTargetOwnership() {
-        for (long seed = 0; seed < 128; seed++) {
+        for (long seed = 0; seed < 1_024; seed++) {
             verifyGeneratedTrace(new ProductionLedger(), seed, 160);
+        }
+    }
+
+    @Test
+    void multiPlayerSessionLedgerAndPaymentStateMachineHasNoCrossWiringOrDoubleDeduction() {
+        List<UUID> players = List.of(
+            new UUID(10L, 1L),
+            new UUID(10L, 2L),
+            new UUID(10L, 3L),
+            new UUID(10L, 4L),
+            new UUID(10L, 5L),
+            new UUID(10L, 6L)
+        );
+        PlaneKind[] tpaKinds = {PlaneKind.NORMAL, PlaneKind.ENDER};
+
+        for (long seed = 1L; seed <= 1_024; seed++) {
+            Random rng = new Random(seed * 0x517CC1B727220A95L);
+            SelectionSessions sessions = new SelectionSessions();
+            TeleportRequestLedger ledger = new TeleportRequestLedger();
+
+            // Per-player inventory of planes and active warmup payments
+            Map<UUID, Map<PlaneKind, Integer>> inventory = new HashMap<>();
+            Map<UUID, Map<PlaneKind, Integer>> totalConsumed = new HashMap<>();
+            Map<UUID, UUID> activeSessionToken = new HashMap<>();
+            Map<UUID, PlaneKind> activeWarmup = new HashMap<>();
+            Map<UUID, UUID> activeWarmupRequestId = new HashMap<>();
+            Map<UUID, TeleportRequestLedger.Pending> ftbRequests = new LinkedHashMap<>();
+            List<UUID> allRequestIds = new ArrayList<>();
+            java.util.Set<UUID> completedRequestIds = new java.util.HashSet<>();
+            long nextReqSeq = 1L;
+            long now = 0L;
+
+            for (UUID p : players) {
+                Map<PlaneKind, Integer> inv = new java.util.EnumMap<>(PlaneKind.class);
+                Map<PlaneKind, Integer> cons = new java.util.EnumMap<>(PlaneKind.class);
+                for (PlaneKind k : tpaKinds) {
+                    inv.put(k, 8);
+                    cons.put(k, 0);
+                }
+                inventory.put(p, inv);
+                totalConsumed.put(p, cons);
+            }
+
+            for (int step = 0; step < 100; step++) {
+                String ctx = "seed=" + seed + ", step=" + step + ", now=" + now;
+                UUID actor = players.get(rng.nextInt(players.size()));
+                int op = rng.nextInt(8);
+
+                switch (op) {
+                    case 0 -> {
+                        // Open selection session
+                        PlaneKind kind = tpaKinds[rng.nextInt(tpaKinds.length)];
+                        if (!ledger.hasPending(actor) && !activeWarmup.containsKey(actor) && inventory.get(actor).get(kind) > 0) {
+                            UUID token = sessions.open(actor, kind, now);
+                            activeSessionToken.put(actor, token);
+                        }
+                    }
+                    case 1 -> {
+                        // Submit RequestTeleportPacket (sometimes with stale/wrong token or self target)
+                        UUID token = rng.nextBoolean()
+                            ? activeSessionToken.getOrDefault(actor, UUID.randomUUID())
+                            : activeSessionToken.getOrDefault(players.get(rng.nextInt(players.size())), UUID.randomUUID());
+                        UUID target = players.get(rng.nextInt(players.size()));
+                        Optional<PlaneKind> consumed = sessions.consume(actor, token, now);
+                        if (consumed.isPresent()) {
+                            PlaneKind kind = consumed.get();
+                            if (!ledger.hasPending(actor)
+                                && !activeWarmup.containsKey(actor)
+                                && !target.equals(actor)
+                                && inventory.get(actor).get(kind) > 0) {
+                                UUID reqId = new UUID(seed, nextReqSeq++);
+                                TeleportRequestLedger.Pending p = new TeleportRequestLedger.Pending(reqId, actor, target, kind);
+                                assertEquals(true, ledger.add(p), ctx + ": fresh request must enter ledger");
+                                ftbRequests.put(reqId, p);
+                                allRequestIds.add(reqId);
+                            }
+                        }
+                    }
+                    case 2 -> {
+                        // Accept request (actor may be rightful target OR malicious third party)
+                        if (!allRequestIds.isEmpty()) {
+                            UUID reqId = allRequestIds.get(rng.nextInt(allRequestIds.size()));
+                            Optional<TeleportRequestLedger.Pending> found = ledger.byRequest(reqId);
+                            if (found.isPresent()) {
+                                TeleportRequestLedger.Pending p = found.get();
+                                if (!ledger.isOwnedByTarget(reqId, actor)) {
+                                    // Non-target MUST NOT trigger accept or consume requester's plane
+                                    assertEquals(false, p.targetId().equals(actor), ctx);
+                                } else if (!activeWarmup.containsKey(p.requesterId())
+                                    && inventory.get(p.requesterId()).get(p.planeKind()) > 0
+                                    && ftbRequests.containsKey(reqId)) {
+                                    // Rightful target starts warmup (plane not yet deducted until completion)
+                                    ftbRequests.remove(reqId);
+                                    activeWarmup.put(p.requesterId(), p.planeKind());
+                                    activeWarmupRequestId.put(p.requesterId(), reqId);
+                                }
+                            }
+                        }
+                    }
+                    case 3 -> {
+                        // Deny request (actor may be rightful target OR malicious third party)
+                        if (!allRequestIds.isEmpty()) {
+                            UUID reqId = allRequestIds.get(rng.nextInt(allRequestIds.size()));
+                            Optional<TeleportRequestLedger.Pending> found = ledger.byRequest(reqId);
+                            if (found.isPresent() && found.get().targetId().equals(actor)) {
+                                // Only if not already in warmup
+                                if (!reqId.equals(activeWarmupRequestId.get(found.get().requesterId()))) {
+                                    ledger.remove(reqId);
+                                    ftbRequests.remove(reqId);
+                                }
+                            }
+                        }
+                    }
+                    case 4 -> {
+                        // Complete warmup (succeeds or fails/refunds)
+                        PlaneKind kind = activeWarmup.remove(actor);
+                        UUID reqId = activeWarmupRequestId.remove(actor);
+                        if (kind != null) {
+                            boolean succeeded = rng.nextInt(4) != 0;
+                            int before = inventory.get(actor).get(kind);
+                            if (succeeded && before > 0) {
+                                // Atomic deduction ONLY on success for consumable planes
+                                if (kind.consumable()) {
+                                    inventory.get(actor).put(kind, before - 1);
+                                    totalConsumed.get(actor).merge(kind, 1, Integer::sum);
+                                }
+                                assertEquals(true, completedRequestIds.add(reqId), ctx + ": request completed twice (double deduction!)");
+                                ledger.remove(reqId);
+                            } else {
+                                // Failed teleport -> refund (net 0 deduction) & reconcile
+                                ledger.remove(reqId);
+                            }
+                        }
+                    }
+                    case 5 -> {
+                        // Cancel warmup (movement interruption -> 0 deduction)
+                        UUID reqId = activeWarmupRequestId.remove(actor);
+                        if (activeWarmup.remove(actor) != null && reqId != null) {
+                            ledger.remove(reqId);
+                        }
+                    }
+                    case 6 -> {
+                        // Logout: clear session, warmup, and all ledger requests involving actor
+                        sessions.remove(actor);
+                        activeSessionToken.remove(actor);
+                        activeWarmup.remove(actor);
+                        activeWarmupRequestId.remove(actor);
+                        for (TeleportRequestLedger.Pending removed : ledger.removePlayer(actor)) {
+                            ftbRequests.remove(removed.requestId());
+                        }
+                    }
+                    case 7 -> {
+                        // Advance server clock (tests session expiration)
+                        now += rng.nextBoolean() ? 200L : 700L;
+                    }
+                    default -> throw new AssertionError();
+                }
+
+                // Global invariants after EVERY single state transition:
+                for (UUID p : players) {
+                    // 1. Ender planes NEVER decrease
+                    assertEquals(8, inventory.get(p).get(PlaneKind.ENDER), ctx + ": ender plane was consumed!");
+                    assertEquals(0, totalConsumed.get(p).get(PlaneKind.ENDER), ctx + ": ender plane consumption counter non-zero!");
+                    // 2. Normal plane accounting exact: remaining + consumed == initial (8)
+                    int rem = inventory.get(p).get(PlaneKind.NORMAL);
+                    int cons = totalConsumed.get(p).get(PlaneKind.NORMAL);
+                    assertEquals(8, rem + cons, ctx + ": plane conservation violated for " + p);
+                    // 3. Ledger bijective consistency (no orphan locks / no cross-wiring)
+                    Optional<TeleportRequestLedger.Pending> pending = ledger.pendingFor(p);
+                    assertEquals(pending.isPresent(), ledger.hasPending(p), ctx);
+                    pending.ifPresent(entry -> {
+                        assertEquals(p, entry.requesterId(), ctx + ": requester mismatch (cross-wiring!)");
+                        assertEquals(Optional.of(entry), ledger.byRequest(entry.requestId()), ctx + ": byRequest mismatch");
+                        assertEquals(true, ledger.isOwnedByTarget(entry.requestId(), entry.targetId()), ctx);
+                        for (UUID other : players) {
+                            if (!other.equals(entry.targetId())) {
+                                assertEquals(false, ledger.isOwnedByTarget(entry.requestId(), other), ctx + ": wrong target owns request!");
+                            }
+                        }
+                    });
+                }
+            }
         }
     }
 

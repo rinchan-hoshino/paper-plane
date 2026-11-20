@@ -79,6 +79,20 @@ Includes built-in translations for:
 - Traditional Chinese (`zh_tw`)
 - Japanese (`ja_jp`)
 
+## Building & Verification
+
+Enable the local `pre-push` verification hook once per clone:
+
+```bash
+./scripts/setup-hooks.sh
+```
+
+Run the full verification suite (6-target build matrix, property-based invariant tests, packaged-JAR architecture contracts, client `TeleportPlayerScreen` black-box test, and packaged-JAR Minecraft `1.21.1` NeoForge GameTest E2E with FTB Library + FTB Essentials). Pass `--container` (or omit JDK 17/21/25 on the host) to run inside `Dockerfile.verify`:
+
+```bash
+./scripts/verify.sh [--container]
+```
+
 ## License
 
 `GPL-3.0-only` — see [LICENSE](LICENSE).
