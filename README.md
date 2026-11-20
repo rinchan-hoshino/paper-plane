@@ -79,10 +79,6 @@ Includes built-in translations for:
 - Traditional Chinese (`zh_tw`)
 - Japanese (`ja_jp`)
 
-## Save Compatibility
-
-Upgrading from 1.x worlds is lossless: legacy `paper_plane:soggy_paper_plane` items in player inventories or containers are automatically remapped to `paper_plane:paper_plane`.
-
 ## License
 
 `GPL-3.0-only` — see [LICENSE](LICENSE).

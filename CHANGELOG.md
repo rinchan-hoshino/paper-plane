@@ -21,7 +21,7 @@ All notable changes to Paper Plane are documented in this file.
 - Consolidated fragmented `shared/` directories into `shared/core`, `shared/modern`, `shared/resources`, `shared/resources-modern`, `shared/test`, and compile-only `shared/modmenu-stub`.
 
 ### Removed
-- Removed the legacy Soggy Paper Plane (`paper_plane:soggy_paper_plane`) item, water-wetting `ItemEntityMixin`, models, and textures. Legacy worlds seamlessly migrate `paper_plane:soggy_paper_plane` to `paper_plane:paper_plane` via registry aliases / `MissingMappingsEvent`.
+- Removed the Soggy Paper Plane (`paper_plane:soggy_paper_plane`) item, water-wetting `ItemEntityMixin`, models, and textures.
 - Removed dead flight/entity remnants (`PaperPlaneFlightModel`, `PaperPlaneEntity`, `PaperPlaneEntityRenderer`, `PaperPlaneClientItemExtensions`, `entity.paper_plane.paper_plane`, and `docs/images/plane-in-flight.png`).
 - Removed transitional version profiles (`1.19.2`, `1.20.4`, `1.20.6`, `1.21`, `1.21.11`) and unused `night-config` shading.
 
