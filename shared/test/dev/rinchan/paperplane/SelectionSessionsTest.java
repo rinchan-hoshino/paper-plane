@@ -39,8 +39,8 @@ final class SelectionSessionsTest {
         UUID token = sessions.open(player, PlaneKind.NORMAL, 0);
         assertTrue(sessions.consume(UUID.randomUUID(), token, 10).isEmpty());
         assertTrue(sessions.consume(player, token, 600).isEmpty());
-        token = sessions.open(player, PlaneKind.SOGGY, 600);
-        assertEquals(PlaneKind.SOGGY, sessions.consume(player, token, 1199).orElseThrow());
+        token = sessions.open(player, PlaneKind.BACK, 600);
+        assertEquals(PlaneKind.BACK, sessions.consume(player, token, 1199).orElseThrow());
     }
     @Test void disconnectRevokesSelection() {
         SelectionSessions sessions = new SelectionSessions();

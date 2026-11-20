@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.rinchan.paperplane.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "TPACommandMixin",
+    "NativeTeleportMixin",
+    "NativeWarmupMixin"
+  ],
+  "client": [
+    "ScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

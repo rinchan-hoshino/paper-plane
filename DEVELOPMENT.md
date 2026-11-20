@@ -1,15 +1,30 @@
 # Development
 
-Use JDK 21 to launch Gradle. Profiles request the appropriate Java 17, 21 or 25 toolchain.
+## Prerequisites
 
-```sh
-python3 scripts/build.py                         # all 17 published combinations
-python3 scripts/build.py --minecraft 1.20.6     # both loaders for one Minecraft version
-python3 scripts/build.py --loader fabric        # Fabric across every supported version
-./gradlew build                                # default 1.21.1 profile
+- JDK 17 (for `1.20.1`)
+- JDK 21 (for `1.21.1`)
+- JDK 25 (for `26.1.2`)
+- Python 3.10+
+
+## Building & Verifying All 6 Targets
+
+Run the unified build & verification matrix:
+
+```bash
+python3 scripts/build-matrix.py
 ```
 
-`matrix.json` is the supported-version list. Each profile keeps its loader/build API differences; `shared/java` contains version-independent gameplay and selection sessions. `shared/modern` contains the modern FTB teleport/payment service and request ledger. Minecraft accessors stay in each profile's small `PaperPlanePlatform`. The 1.19.2/1.20.1 profile retains its adapter for the older FTB API and string request IDs.
+This script:
+1. Runs Python contract tests in `tests/`.
+2. Builds and runs all JUnit tests for all 6 targets defined in `matrix.json`:
+   - `1.20.1` (`fabric`, `forge`)
+   - `1.21.1` (`fabric`, `neoforge`)
+   - `26.1.2` (`fabric`, `neoforge`)
+3. Verifies every output JAR contains `icon.png`, all 4 localizations (`en_us`, `zh_cn`, `zh_tw`, `ja_jp`), all 4 origami item models & 8 item textures, and zero `rinlib`, `soggy`, `FlightModel`, or compile-only stub residue.
 
+To build a subset:
 
-Do not replace real client/server verification with source-text checks or compilation alone. Exercise request acceptance, denial and consumption with `/tpa` disabled, and verify the packaged jars in an isolated game instance.
+```bash
+python3 scripts/build-matrix.py --minecraft 1.21.1 --loader neoforge
+```

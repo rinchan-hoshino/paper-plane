@@ -156,7 +156,6 @@ class NativeWarmupPaymentTest {
     when(inventory.getContainerSize()).thenReturn(1);
     var item = switch (kind) {
       case NORMAL -> dev.rinchan.paperplane.registry.PaperPlaneRegistries.PAPER_PLANE.get();
-      case SOGGY -> dev.rinchan.paperplane.registry.PaperPlaneRegistries.SOGGY_PAPER_PLANE.get();
       case ENDER -> dev.rinchan.paperplane.registry.PaperPlaneRegistries.ENDER_PAPER_PLANE.get();
       case BACK -> dev.rinchan.paperplane.registry.PaperPlaneRegistries.BACK_PAPER_PLANE.get();
       case ENDER_BACK -> dev.rinchan.paperplane.registry.PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get();

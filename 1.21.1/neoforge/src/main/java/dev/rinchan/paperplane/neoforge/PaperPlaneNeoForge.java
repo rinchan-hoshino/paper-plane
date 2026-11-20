@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
@@ -21,14 +22,14 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(PaperPlane.MOD_ID)
 public class PaperPlaneNeoForge {
-    public PaperPlaneNeoForge(IEventBus modBus) {
+    public PaperPlaneNeoForge(IEventBus modBus, ModContainer modContainer) {
         PaperPlane.configure(net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get());
         PaperPlaneRegistries.register(modBus);
         modBus.addListener(this::registerPayloads);
         modBus.addListener(this::addCreativeTabItems);
         NeoForge.EVENT_BUS.addListener(this::onPlayerLogout);
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            PaperPlaneNeoForgeClient.register(modBus);
+            PaperPlaneNeoForgeClient.register(modContainer);
         }
     }
 
@@ -61,7 +62,6 @@ public class PaperPlaneNeoForge {
     private void addCreativeTabItems(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(PaperPlaneRegistries.PAPER_PLANE.get());
-            event.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.BACK_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get());

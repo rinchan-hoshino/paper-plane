@@ -10,6 +10,8 @@ import java.util.function.IntSupplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
@@ -21,23 +23,44 @@ public final class PaperPlane {
     private static final TPACommand FTB_TPA = new TPACommand();
     private static final TeleportRequestLedger REQUESTS = new TeleportRequestLedger();
     private static final SelectionSessions SELECTIONS = new SelectionSessions();
-    private static PaperPlaneConfig config = new PaperPlaneConfig(true, true);
+    private static final PaperPlaneConfig.Holder CONFIG = new PaperPlaneConfig.Holder();
 
     private PaperPlane() {
     }
 
     public static void configure(java.nio.file.Path directory) {
         try {
-            config = PaperPlaneConfig.load(directory);
+            CONFIG.configure(directory);
         } catch (java.io.IOException failure) {
             throw new java.io.UncheckedIOException("Cannot load Paper Plane configuration", failure);
         }
     }
 
+    public static PaperPlaneConfig currentConfig() {
+        return CONFIG.get();
+    }
+
+    public static void saveConfig(PaperPlaneConfig updated) {
+        try {
+            CONFIG.saveAndApply(updated);
+        } catch (java.io.IOException failure) {
+            LOGGER.error("Cannot save Paper Plane configuration", failure);
+        }
+    }
+
     private static boolean enabled(ServerPlayer player, boolean returning) {
-        if (returning ? config.enableBack() : config.enableTpa()) return true;
+        PaperPlaneConfig current = CONFIG.get();
+        if (returning ? current.enableBack() : current.enableTpa()) return true;
         player.sendSystemMessage(Component.translatable(returning ? "message.paper_plane.back_disabled" : "message.paper_plane.tpa_disabled").withStyle(ChatFormatting.RED));
         return false;
+    }
+
+    private static void playPlaneSound(ServerPlayer player, PlaneKind kind) {
+        if (player.level() == null) return;
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 0.7F, 1.15F);
+        if (kind.ender()) {
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.45F, 1.35F);
+        }
     }
 
     public static void openTeleportScreen(ServerPlayer player, PlaneKind planeKind) {
@@ -64,6 +87,7 @@ public final class PaperPlane {
         }
 
         UUID sessionId = SELECTIONS.open(player.getUUID(), planeKind, PaperPlanePlatform.server(player).overworld().getGameTime());
+        playPlaneSound(player, planeKind);
         PaperPlaneNetworking.sendToPlayer(
             player,
             PaperPlaneNetworking.playerListPacket(PaperPlanePlatform.server(player), player.getUUID(), sessionId, planeKind)
@@ -82,6 +106,7 @@ public final class PaperPlane {
         }
         var data = FtbPlayerData.get(player);
         if (data.isEmpty()) return;
+        playPlaneSound(player, kind);
         TeleportPayments.begin(player, kind, data.get().backTeleporter);
         try {
             if (FtbBack.run(player) <= 0) TeleportPayments.failed(player.getUUID());
@@ -268,7 +293,6 @@ public final class PaperPlane {
     private static int findPlaneSlot(ServerPlayer player, PlaneKind planeKind) {
         Item item = switch (planeKind) {
             case NORMAL -> PaperPlaneRegistries.PAPER_PLANE.get();
-            case SOGGY -> PaperPlaneRegistries.SOGGY_PAPER_PLANE.get();
             case ENDER -> PaperPlaneRegistries.ENDER_PAPER_PLANE.get();
             case BACK -> PaperPlaneRegistries.BACK_PAPER_PLANE.get();
             case ENDER_BACK -> PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get();

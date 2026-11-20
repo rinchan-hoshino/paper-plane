@@ -11,8 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 class ResponseRoutingTest(unittest.TestCase):
     def test_legacy_and_modern_buttons_always_reach_the_server(self):
         for profile, request_id, parameter_type in [
-            ("1.19.2-1.20.1", "CAFEBABE", "String"),
+            ("1.20.1", "CAFEBABE", "String"),
             ("1.21.1", "d0c45834-82c8-4419-a8a5-192132858e40", "java.util.UUID"),
+            ("26.1.2", "d0c45834-82c8-4419-a8a5-192132858e40", "java.util.UUID"),
         ]:
             with self.subTest(profile=profile), tempfile.TemporaryDirectory() as temporary:
                 directory = Path(temporary)
@@ -22,7 +23,7 @@ class ResponseRoutingTest(unittest.TestCase):
                 source = ROOT / profile / "common/src/main/java/dev/rinchan/paperplane/client/PaperPlaneClient.java"
                 (client / source.name).write_text(source.read_text())
                 (package / "TeleportResponseCommand.java").write_text(
-                    (ROOT / "shared/java/dev/rinchan/paperplane/TeleportResponseCommand.java").read_text()
+                    (ROOT / "shared/core/dev/rinchan/paperplane/TeleportResponseCommand.java").read_text()
                 )
                 (package / "OpenTeleportScreenPacket.java").write_text(
                     "package dev.rinchan.paperplane; public record OpenTeleportScreenPacket(java.util.UUID sessionId, java.util.List<Object> players, boolean enderPlane) {}"

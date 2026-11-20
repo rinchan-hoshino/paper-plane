@@ -23,7 +23,7 @@ final class TeleportRequestLedgerTest {
         UUID requester = UUID.randomUUID();
         UUID target = UUID.randomUUID();
         UUID request = UUID.randomUUID();
-        ledger.add(new TeleportRequestLedger.Pending(request, requester, target, PlaneKind.SOGGY));
+        ledger.add(new TeleportRequestLedger.Pending(request, requester, target, PlaneKind.BACK));
         ledger.remove(request);
         assertFalse(ledger.hasPending(requester));
         assertTrue(ledger.add(new TeleportRequestLedger.Pending(UUID.randomUUID(), requester, target, PlaneKind.NORMAL)));

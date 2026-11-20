@@ -9,15 +9,11 @@ import org.junit.jupiter.api.Test;
 
 final class PaperPlaneAuthorityContractTest {
     private static Path source(String relative) {
-        for (String local : new String[]{"common/src/main/java", "../common/src/main/java", "neoforge/src/main/java", "../neoforge/src/main/java"}) {
+        for (String local : new String[]{"common/src/main/java", "../common/src/main/java", "neoforge/src/main/java", "../neoforge/src/main/java", "fabric/src/main/java", "../fabric/src/main/java"}) {
             Path candidate = Path.of(local).resolve(relative);
             if (Files.isRegularFile(candidate)) return candidate;
         }
-        for (String sharedDir : new String[]{
-            "shared/modern", "shared/java", "shared/java-1.20.4-plus", "shared/java-1.20.6-plus",
-            "shared/java-1.20.4-1.21.1", "shared/java-1.20.6-1.21.1",
-            "shared/neoforge-1.20.6-plus", "shared/neoforge-1.20.6-1.21.1"
-        }) {
+        for (String sharedDir : new String[]{"shared/modern", "shared/core"}) {
             for (String prefix : new String[]{"../", "../../"}) {
                 Path candidate = Path.of(prefix + sharedDir).resolve(relative);
                 if (Files.isRegularFile(candidate)) return candidate;
@@ -48,8 +44,6 @@ final class PaperPlaneAuthorityContractTest {
         assertTrue(requestPacket.contains("UUID sessionId"));
         assertTrue(client.contains("TeleportResponseCommand.parse(command)"));
         assertFalse(client.contains("TRACKED_REQUESTS"));
-        String owner = Files.readString(source("dev/rinchan/paperplane/PaperPlane.java"));
-        String platform = Files.readString(source("dev/rinchan/paperplane/neoforge/PaperPlaneNeoForge.java"));
     }
 
     @Test
@@ -61,29 +55,23 @@ final class PaperPlaneAuthorityContractTest {
         assertFalse(platform.contains(".optional()"));
         assertTrue(platform.contains("LOGGER.error"));
         assertFalse(platform.contains("exceptionally(throwable -> null)"));
-        String owner = Files.readString(source("dev/rinchan/paperplane/PaperPlane.java"));
-
     }
 
     @Test
-    void droppedPlanesOwnTheirSingleWaterTransition() throws Exception {
-        String wetting = Files.readString(source("dev/rinchan/paperplane/mixin/ItemEntityMixin.java"));
+    void soggyVariantIsRemovedAndRemappedLosslessly() throws Exception {
         String mixins = Files.readString(resource("paper_plane.mixins.json"));
-        assertTrue(wetting.contains("stack.is(PaperPlaneRegistries.PAPER_PLANE.get())"));
-        assertTrue(wetting.contains("SOGGY_PAPER_PLANE"));
-        assertTrue(mixins.contains("ItemEntityMixin"));
+        assertFalse(mixins.contains("ItemEntityMixin"));
         assertFalse(Files.exists(resource("data/paper_plane/recipe/soggy_paper_plane.json")));
+        assertTrue(Files.readString(source("dev/rinchan/paperplane/registry/PaperPlaneRegistries.java")).contains("addAlias"));
     }
 
     @Test
-    void worldEntityHeadingAndHandTransformsRemainUnchanged() throws Exception {
-        String renderer = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneEntityRenderer.java"));
-        assertTrue(renderer.contains("plane.getYRot()"));
-        assertFalse(renderer.contains("cameraOrientation"));
-        String pose = Files.readString(source("dev/rinchan/paperplane/client/PaperPlaneClientItemExtensions.java"));
-        assertTrue(pose.contains("side > 0.0F ? -225.0F : -45.0F"));
-        String model = Files.readString(resource("assets/paper_plane/models/item/paper_plane.json"));
-        assertTrue(model.contains("\"firstperson_righthand\": {\n      \"rotation\": [\n        0,\n        225"));
-        assertTrue(model.contains("\"firstperson_lefthand\": {\n      \"rotation\": [\n        0,\n        45"));
+    void generatedItemModelsReferenceOwnTextures() throws Exception {
+        for (String item : new String[]{"paper_plane", "ender_paper_plane", "back_paper_plane", "ender_back_paper_plane"}) {
+            String model = Files.readString(resource("assets/paper_plane/models/item/" + item + ".json"));
+            assertTrue(model.contains("\"parent\": \"minecraft:item/generated\""));
+            assertTrue(model.contains("\"layer0\": \"paper_plane:item/" + item + "\""));
+            assertFalse(model.contains("_edge"));
+        }
     }
 }

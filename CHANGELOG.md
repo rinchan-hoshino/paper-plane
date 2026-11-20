@@ -1,53 +1,33 @@
 # Changelog
 
-## 1.3.0
+All notable changes to Paper Plane are documented in this file.
 
-- Adds Back Paper Plane (4 Bone Meal around a Paper Plane) and Ender Back Paper Plane (8 Ender Pearls around a Back Paper Plane) that return you to your previous position through FTB Essentials' history.
-- Single-use Back Paper Planes are consumed only after the teleport completes; cancelled or failed teleports keep the item.
-- Adds `enableTpa` and `enableBack` in `config/paper_plane.toml` to switch each plane family on or off independently of FTB commands.
-- Paper planes stay non-throwable and use right-click on all 17 supported combinations.
+## [2.0.0] - 2026-11-20
 
-## 1.2.0
+### Added
+- Rebuilt `TeleportPlayerScreen` using native FTB Library scrollable `Panel` + `PanelScrollBar`, fixing list overflow on servers with more than 7 online players.
+- Added player skin head avatars (`FaceIcon`) beside each player entry in the teleport picker.
+- Added a live case-insensitive search box at the top of the teleport picker with Enter-to-send when narrowed to a single target.
+- Added concise usage tooltips for all 4 paper plane items.
+- Added subtle right-click sound feedback (`BOOK_PAGE_TURN` for all planes, layered with `AMETHYST_BLOCK_CHIME` for Ender planes).
+- Replaced NightConfig with a zero-dependency commented `config/paper_plane.toml` supporting automatic hot-reload without restarting.
+- Added native in-game Config Screen (`PaperPlaneConfigScreen`) integrated with Mod Menu (Fabric), Forge, and NeoForge.
+- Added Traditional Chinese (`zh_tw`) and Japanese (`ja_jp`) localizations alongside updated `en_us` and `zh_cn`.
+- Replaced project icon with a new 64x64 pixel-art badge (`512x512` `icon.png`).
+- Added `26.1.2` item model definitions (`assets/paper_plane/items/*.json`), `FEATURE_MAP.md`, CI workflow, and `scripts/build-matrix.py`.
 
-- Right-click or sneak-right-click opens the player list directly; charging and throwing are removed.
-- Accept requests are checked against the recipient before FTB Essentials handles them; rapid clicks and expired requests end cleanly.
-- Reopening the player list with the same plane type keeps the original 30-second window.
-- Requires both client and server to be updated to 1.2.0 (network protocol change).
+### Changed
+- Converged supported build matrix to 6 mainstream targets: `1.20.1` (Fabric/Forge), `1.21.1` (Fabric/NeoForge), and `26.1.2` (Fabric/NeoForge).
+- Consolidated fragmented `shared/` directories into `shared/core`, `shared/modern`, `shared/resources`, `shared/resources-modern`, `shared/test`, and compile-only `shared/modmenu-stub`.
 
-## 1.1.2
+### Removed
+- Removed the legacy Soggy Paper Plane (`paper_plane:soggy_paper_plane`) item, water-wetting `ItemEntityMixin`, models, and textures. Legacy worlds seamlessly migrate `paper_plane:soggy_paper_plane` to `paper_plane:paper_plane` via registry aliases / `MissingMappingsEvent`.
+- Removed dead flight/entity remnants (`PaperPlaneFlightModel`, `PaperPlaneEntity`, `PaperPlaneEntityRenderer`, `PaperPlaneClientItemExtensions`, `entity.paper_plane.paper_plane`, and `docs/images/plane-in-flight.png`).
+- Removed transitional version profiles (`1.19.2`, `1.20.4`, `1.20.6`, `1.21`, `1.21.11`) and unused `night-config` shading.
 
-- Fixes spurious expired-selection errors when repeatedly using the same paper plane while the player list is open.
+## [1.3.0] - 2026-10-27
+- Added configurable native Back Paper Plane and Ender Back Paper Plane items.
+- Settled single-use plane payments only after native teleport completion.
 
-## 1.1.1
-
-- Requires RinLib on all supported Minecraft versions and loaders.
-- Rejects stale selection tokens without invalidating a newer selection screen.
-- Validates the recipient before processing accept or deny packets.
-- Corrects Fabric dependency ranges on 1.19.2 and 1.20.1, and item registration on 26.1.2.
-
-## 1.1.0
-
-- Requires RinLib 1.0.2 or newer on Fabric and NeoForge.
-- Refreshes the project icon, description and screenshots.
-
-## 1.0.1
-
-- Routes every valid FTB accept/deny button through the server-owned Paper Plane ledger.
-- Returns non-Paper Plane request buttons to their original FTB command.
-
-## 1.0.0
-
-- Stable release: server-authoritative requests, atomic payment, deterministic glide physics and corrected hand transforms.
-- Publishes all 17 stable FTB Library / FTB Essentials targets from Minecraft 1.19.2 through 26.1.2 across Fabric, Forge and NeoForge.
-- Replaces the Lychee/Kiwi water recipe with an owned item-water boundary.
-
-## 0.1.9
-
-- Corrects right- and left-hand model rotations so the charging pose points the nose back toward the player.
-
-## 0.1.8
-
-- Adds the sneak-use blowing pose and deterministic lift, drag, gravity, stall and glide physics.
-- Makes plane kind server-authoritative and allows one pending teleport target per requester.
-- Removes the plane before a successful FTB acceptance and refunds failed teleports.
-- Limits accept/deny interception to tracked Paper Plane request IDs.
+## [1.2.0] - 2026-10-24
+- Fixed repeated teleport responses and removed throwing across all supported profiles.

@@ -15,6 +15,9 @@
     ],
     "client": [
       "dev.rinchan.paperplane.fabric.PaperPlaneFabricClient"
+    ],
+    "modmenu": [
+      "dev.rinchan.paperplane.fabric.PaperPlaneModMenu"
     ]
   },
   "mixins": [

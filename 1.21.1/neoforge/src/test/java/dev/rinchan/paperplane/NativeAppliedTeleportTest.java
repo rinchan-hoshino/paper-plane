@@ -159,7 +159,6 @@ class NativeAppliedTeleportTest {
             when(inventory.getContainerSize()).thenReturn(1);
             stack = new ItemStack(switch (kind) {
                 case NORMAL -> PaperPlaneRegistries.PAPER_PLANE.get();
-                case SOGGY -> PaperPlaneRegistries.SOGGY_PAPER_PLANE.get();
                 case ENDER -> PaperPlaneRegistries.ENDER_PAPER_PLANE.get();
                 case BACK -> PaperPlaneRegistries.BACK_PAPER_PLANE.get();
                 case ENDER_BACK -> PaperPlaneRegistries.ENDER_BACK_PAPER_PLANE.get();
