@@ -31,9 +31,19 @@ TEXT_CHECK_SUFFIXES = (".json", ".toml")
 
 
 def resolve_java_home(version: int) -> str | None:
+    for env_key in (
+        f"JAVA_{version}_HOME",
+        f"JAVA_HOME_{version}_X64",
+        f"JAVA_HOME_{version}_ARM64",
+    ):
+        env_val = os.environ.get(env_key)
+        if env_val and os.path.isfile(os.path.join(env_val, "bin", "java")):
+            return env_val
+
     candidates = [
         f"/opt/homebrew/opt/openjdk@{version}/libexec/openjdk.jdk/Contents/Home",
         f"/opt/homebrew/opt/openjdk@{version}",
+        *sorted(glob.glob(f"/usr/lib/jvm/*{version}*")),
     ]
     gradle_jdks = sorted(glob.glob(os.path.expanduser(f"~/.gradle/jdks/*-{version}-*")))
     for p in gradle_jdks:
