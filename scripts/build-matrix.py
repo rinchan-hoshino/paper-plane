@@ -89,6 +89,26 @@ def verify_jar(jar_path: Path, mc: str, loader: str) -> None:
         if "icon.png" not in names:
             errors.append("missing icon.png")
 
+        if mc == "1.20.1" and loader == "forge":
+            if "pack.mcmeta" not in names:
+                errors.append("missing pack.mcmeta")
+            else:
+                try:
+                    pack_json = json.loads(zf.read("pack.mcmeta").decode("utf-8"))
+                    if pack_json.get("pack", {}).get("pack_format") != 15:
+                        errors.append(
+                            f"pack.mcmeta pack.pack_format must be 15, got {pack_json.get('pack', {}).get('pack_format')!r}"
+                        )
+                except Exception as exc:
+                    errors.append(f"invalid JSON in pack.mcmeta: {exc}")
+        elif "pack.mcmeta" in names:
+            try:
+                pack_json = json.loads(zf.read("pack.mcmeta").decode("utf-8"))
+                if pack_json.get("pack", {}).get("pack_format") == 15:
+                    errors.append("unexpected pack.mcmeta with pack_format == 15")
+            except Exception as exc:
+                errors.append(f"invalid JSON in pack.mcmeta: {exc}")
+
         for lang in REQUIRED_LANGS:
             path = f"assets/paper_plane/lang/{lang}.json"
             if path not in names:

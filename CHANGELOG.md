@@ -2,6 +2,11 @@
 
 All notable changes to Paper Plane are documented in this file.
 
+## [2.0.3] - 2026-11-21
+
+### Fixed
+- Fixed missing pack.mcmeta (ResourcePackInfo startup warning) on Minecraft 1.20.1 Forge.
+
 ## [2.0.2] - 2026-11-20
 
 ### Fixed
