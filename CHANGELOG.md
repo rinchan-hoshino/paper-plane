@@ -5,7 +5,7 @@ All notable changes to Paper Plane are documented in this file.
 ## [2.0.4] - 2026-11-21
 
 ### Changed
-- Refined all 4 16x16 paper plane item sprites (`paper_plane`, `ender_paper_plane`, `back_paper_plane`, `ender_back_paper_plane`) with crisp 3D origami facets, a visible finger-grip keel, and unified silhouette masks.
+- Refined all 4 16x16 paper plane item sprites (`paper_plane`, `ender_paper_plane`, `back_paper_plane`, `ender_back_paper_plane`) with crisp origami fold shading, a visible finger-grip keel, and unified silhouette masks.
 
 ## [2.0.3] - 2026-11-21
 
