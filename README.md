@@ -44,23 +44,6 @@ Edit `config/paper_plane.toml` (reloads automatically without restarting) or use
 
 Cooldowns, warmups, dimension rules, and `/back` history are all controlled by your existing FTB Essentials configuration (`config/ftbessentials.snbt`) — Paper Plane works even when the chat commands themselves are disabled for players.
 
-## Requirements & Supported Versions
+## Requirements
 
 Requires **[FTB Essentials](https://www.curseforge.com/minecraft/mc-mods/ftb-essentials)** and **[FTB Library](https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge)**.
-
-| Minecraft | Loaders | Java |
-| --- | --- | --- |
-| `1.20.1` | Fabric, Forge | 17 |
-| `1.21.1` | Fabric, NeoForge | 21 |
-| `26.1.2` | Fabric, NeoForge | 25 |
-
-## Building
-
-```bash
-./scripts/setup-hooks.sh
-./scripts/verify.sh [--container]
-```
-
-## License
-
-`GPL-3.0-only` — see [LICENSE](LICENSE).
